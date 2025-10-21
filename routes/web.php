@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Administracion\CategoriaController;
 use App\Http\Controllers\Administracion\ProductoController;
-use App\Http\Controllers\Administracion\PrecioCotizacionController; // <-- Importamos el controlador de Cotizaciones
+use App\Http\Controllers\Administracion\PrecioCotizacionController; // Importamos el controlador de Cotizaciones
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 
@@ -44,17 +44,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('administracion')->name('admin
     
     // RUTAS DE COTIZACIÓN
     
-    // 1. Ruta para Listar Cotizaciones de un Producto Específico (NUEVA RUTA)
-    Route::get('productos/{producto}/cotizaciones', [PrecioCotizacionController::class, 'indexProductoCotizacion'])
-         ->name('productos.cotizaciones.index');
-
-    // 2. Ruta para crear una Cotización asociada a un Producto (productos/{producto}/cotizaciones/create)
+    // 1. Ruta para crear una Cotización asociada a un Producto (productos/{producto}/cotizaciones/create)
     Route::get('productos/{producto}/cotizaciones/create', [PrecioCotizacionController::class, 'createProductoCotizacion'])
          ->name('productos.cotizaciones.create');
 
-    // 3. CRUD para Precios de Cotización (Genérica: cotizaciones/...)
-    // Esta ruta debe ir al final para no interferir con las rutas específicas de 'productos'
-    Route::resource('cotizaciones', PrecioCotizacionController::class);
+    // 2. CRUD para Precios de Cotización (Genérica: cotizaciones/...)
+    // ¡CORRECCIÓN CLAVE! Usamos 'parameters' para forzar a Laravel a usar 'cotizacion' 
+    // en la URL y en el controlador, resolviendo el problema de pluralización/singularización.
+    Route::resource('cotizaciones', PrecioCotizacionController::class)->parameters([
+        'cotizaciones' => 'cotizacion',
+    ]);
 });
 
 // --- 3. Ruta Protegida para Clientes (Post-Login)
