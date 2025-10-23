@@ -14,20 +14,28 @@ class CotizadorController extends Controller
      */
     public function index()
     {
-        // 1. Obtener los productos: ID, Nombre, y el Precio (que es el valor base por m²)
-        $productos = Producto::all(['id', 'nombre', 'precio']);
+        // 1. Cargar las REGLAS DE COTIZACIÓN (los ítems cotizables definidos por el admin)
+        // Filtramos por valor > 0 para excluir las solicitudes de cliente (que no tienen valor real)
+        $cotizaciones = Cotizacion::where('valor', '>', 0)
+                                    ->with('producto') // Cargamos la relación si existe
+                                    ->get();
 
-        // 2. Mapear para crear la variable $productosCotizables que espera la vista
-        $productosCotizables = $productos->map(function ($producto) {
+        // 2. Mapear la colección para que el frontend (cotizador.blade.php) la entienda
+        // La vista espera la variable $productosCotizables
+        $productosCotizables = $cotizaciones->map(function ($cotizacion) {
             return [
-                'id' => $producto->id,
-                'nombre' => $producto->nombre,
-                // CRUCIAL: 'valor_base' es el nombre del atributo que usa el JS en cotizador.blade.php
-                'valor_base' => $producto->precio, 
+                // Usamos el ID del registro de Cotización, no del Producto
+                'id' => $cotizacion->id, 
+                // Usamos el NOMBRE de la Cotización. Si está asociado a un producto, lo concatenamos.
+                'nombre' => $cotizacion->nombre . ($cotizacion->producto ? ' (' . $cotizacion->producto->nombre . ')' : ''),
+                // Usamos el campo 'valor' del registro de Cotización como el precio base por m²
+                'valor_base' => $cotizacion->valor,
+                // Puedes añadir margen_porcentaje si lo vas a calcular en el JS
+                // 'margen_porcentaje' => $cotizacion->margen_porcentaje ?? 0, 
             ];
         });
         
-        // 3. Pasar la variable con el nombre correcto a la vista
+        // 3. Pasamos la variable $productosCotizables a la vista.
         return view('cotizador.cotizador', compact('productosCotizables'));
     }
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\Administracion\PrecioCotizacionController; // Importamo
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CotizadorController;
+use App\Http\Controllers\CatalogoController; // Importar el nuevo controlador
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,13 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // --- 4. Ruta Pública para el Cotizador
+
+// Listado de Productos (Catálogo)
+Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
+
+// Vista de Producto Individual (Show)
+Route::get('/catalogo/{producto}', [CatalogoController::class, 'show'])->name('catalogo.show');
+// Cotizador
 Route::get('/cotizador', [CotizadorController::class, 'index'])->name('cotizador.index');
 
 
