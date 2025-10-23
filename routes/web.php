@@ -7,6 +7,7 @@ use App\Http\Controllers\Administracion\ProductoController;
 use App\Http\Controllers\Administracion\PrecioCotizacionController; // Importamos el controlador de Cotizaciones
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CotizadorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,9 @@ Route::middleware(['auth'])->group(function () {
         return view('home'); 
     })->name('home');
 });
+
+// --- 4. Ruta Pública para el Cotizador
+Route::get('/cotizador', [CotizadorController::class, 'index'])->name('cotizador.index');
 
 
 // Ruta por defecto
