@@ -13,7 +13,6 @@
             ← Volver al Catálogo
         </a>
 
-        {{-- 🚨 CRÍTICO: Bloque para mostrar errores de validación --}}
         @if ($errors->any())
             <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg mt-6 mb-6 shadow-md">
                 <p class="font-bold mb-2">⚠️ Por favor, corrige los siguientes errores:</p>
@@ -59,12 +58,15 @@
                     <form action="{{ route('carrito.store') }}" method="POST" class="space-y-4">
                         @csrf
                         
-                        <input type="hidden" name="cotizacion_id" value="{{ $producto->id }}">
+                        <input type="hidden" name="producto_id" value="{{ $producto->id }}">
+                        
+                        <input type="hidden" name="cotizacion_id" value=""> 
                         
                         <input type="hidden" name="ancho" value="">
                         <input type="hidden" name="alto" value="">
                         <input type="hidden" name="costo_final" value="">
-
+                        <input type="hidden" name="requiere_diseno" value=""> 
+                        
                         <div>
                             <label for="cantidad" class="block text-sm font-medium text-gray-700">Cantidad</label>
                             <input type="number" name="cantidad" id="cantidad" min="1" max="{{ $producto->stock }}" value="{{ old('cantidad', 1) }}" 

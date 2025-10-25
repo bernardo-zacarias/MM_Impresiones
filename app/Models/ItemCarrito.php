@@ -13,7 +13,8 @@ class ItemCarrito extends Model
 
     protected $fillable = [
         'carrito_id',
-        'cotizacion_id',
+        'cotizacion_id', // Para ítems de producto variable (cotizado)
+        'producto_id',   // Para ítems de producto fijo (catálogo)
         'ancho',
         'alto',
         'cantidad',
@@ -26,19 +27,32 @@ class ItemCarrito extends Model
         'costo_final' => 'float',
     ];
 
-    /**
-     * Relación: Un ítem pertenece a un carrito.
-     */
     public function carrito()
     {
         return $this->belongsTo(Carrito::class);
     }
+    
+    // Relación al producto fijo de catálogo
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class);
+    }
 
-    /**
-     * Relación: Un ítem está basado en un registro de Cotización.
-     */
+    // Relación al producto variable de cotización
     public function cotizacion()
     {
         return $this->belongsTo(Cotizacion::class);
+    }
+
+    // Método para obtener el nombre del ítem, sin importar su origen
+    public function getNombreItemAttribute()
+    {
+        if ($this->producto_id) {
+            return $this->producto->nombre ?? 'Producto Catálogo';
+        }
+        if ($this->cotizacion_id) {
+            return $this->cotizacion->nombre ?? 'Producto Cotizable';
+        }
+        return 'Ítem Desconocido';
     }
 }

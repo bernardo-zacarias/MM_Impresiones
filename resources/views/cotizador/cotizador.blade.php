@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotizador de Trabajos - Iluminar</title>
-    <!-- CDN Tailwind CSS -->
+    <title>Cotizador de Trabajos - MM Impresiones</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f7f7f7; }
@@ -21,7 +20,7 @@
     <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-2xl border border-gray-100">
 
         <h1 class="text-4xl font-extrabold text-indigo-700 mb-2 border-b pb-2">
-            Calculadora de Cotización <span class="text-sm text-gray-500 block sm:inline">| Iluminar</span>
+            Calculadora de Cotización <span class="text-sm text-gray-500 block sm:inline">| MM Impresiones</span>
         </h1>
         <p class="text-gray-500 mb-8">Selecciona tu tipo de trabajo y las dimensiones para obtener un presupuesto en tiempo real.</p>
 
@@ -29,6 +28,17 @@
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl relative mb-6 shadow-md" role="alert">
                 <strong class="font-bold">¡Genial!</strong>
                 <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        @endif
+        
+        @if ($errors->any())
+            <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl mb-6 shadow-md">
+                <p class="font-bold mb-2">⚠️ Por favor, corrige los siguientes errores:</p>
+                <ul class="list-disc ml-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
@@ -155,17 +165,20 @@
 
                     {{-- Botones de Acción --}}
                     <div class="mt-6 space-y-3">
-                        {{-- El formulario POST simula el envío al carrito --}}
-                        <form action="{{ url('/carrito') }}" method="POST" id="form-carrito">
+                        {{-- 🚨 CORRECCIÓN CLAVE: Apuntando a la ruta con nombre 'carrito.store' --}}
+                        <form action="{{ route('carrito.store') }}" method="POST" id="form-carrito">
                             @csrf
-                            {{-- Campos ocultos para enviar los datos de la cotización final al backend --}}
-                            <input type="hidden" name="cotizacion_id" id="input_cotizacion_id">
+                            
+                            <input type="hidden" name="cotizacion_id" id="input_cotizacion_id"> 
+                            
+                            <input type="hidden" name="producto_id" value=""> 
+                            
                             <input type="hidden" name="alto" id="input_alto">
                             <input type="hidden" name="ancho" id="input_ancho">
                             <input type="hidden" name="cantidad" id="input_cantidad">
                             <input type="hidden" name="costo_final" id="input_costo_final">
                             <input type="hidden" name="requiere_diseno" id="input_requiere_diseno">
-                            
+
                             <button type="submit" id="btn-carrito" disabled
                                 class="w-full bg-yellow-400 text-indigo-900 font-bold py-3 rounded-xl shadow-lg transition duration-300 
                                 hover:bg-yellow-500 disabled:bg-gray-400 disabled:text-gray-700 disabled:cursor-not-allowed">
@@ -227,20 +240,18 @@
             // Bloquear inputs si no se ha seleccionado un trabajo
             const isTrabajoSelected = valorBase > 0;
             inputAlto.disabled = inputAncho.disabled = inputCantidad.disabled = checkDiseno.disabled = !isTrabajoSelected;
+            
             if (!isTrabajoSelected) {
-                 // Asegurarse de que si no hay trabajo, los valores de dimensión se reinicien en el cálculo
-                 inputAlto.value = inputAncho.value = '1.00';
-                 inputCantidad.value = '1';
-                 checkDiseno.checked = false;
-                 updateResumen(0, 0, 0, 0, '---', '0.00', '0', '0.00', false);
+                 // Si no hay trabajo, resetear la interfaz y los valores
+                 updateResumen(0, 0, 0, 0, '---', 0, 0, 0, 0, false);
                  return;
             }
 
             // 1. Cálculo del Área (m²)
-            const area = (alto * ancho).toFixed(2);
+            const area = (alto * ancho);
             
-            // 2. Cálculo del Costo Base por Área y Cantidad
-            let costoBase = parseFloat(area) * valorBase * cantidad;
+            // 2. Cálculo del Costo Base por Área y Cantidad (Asumimos que el valor base ya incluye margen)
+            let costoBase = area * valorBase * cantidad;
             
             // 3. Costo de Diseño
             const costoDiseno = requiereDiseno ? COSTO_DISENO_BASE : 0;
@@ -261,7 +272,7 @@
             resumenProducto.textContent = nombreProducto;
             resumenArea.textContent = `${area} m²`;
             resumenCantidad.textContent = cantidad.toString();
-            resumenValorBase.textContent = `$${valorBase.toLocaleString('es-CL')}`; // Formato de moneda chilena
+            resumenValorBase.textContent = `$${valorBase.toLocaleString('es-CL')}`; 
             costoBaseEl.textContent = `$${Math.round(costoBase).toLocaleString('es-CL')}`;
             costoDisenoEl.textContent = `$${costoDiseno.toLocaleString('es-CL')}`;
             totalFinalEl.textContent = `$${Math.round(totalFinal).toLocaleString('es-CL')}`;
@@ -276,7 +287,7 @@
             inputAnchoHidden.value = ancho.toString();
             inputCantidadHidden.value = cantidad.toString();
             inputCostoFinalHidden.value = Math.round(totalFinal).toString();
-            inputRequiereDisenoHidden.value = requiereDiseno ? '1' : '0';
+            inputRequiereDisenoHidden.value = requiereDiseno ? '1' : '0'; 
         }
 
         // --- Event Listeners ---

@@ -12,18 +12,13 @@ use App\Http\Controllers\Controller;
 
 class CarritoController extends Controller
 {
-    // 1. DEFINICIÓN DE LA CONSTANTE (CORRECCIÓN DE SINTAXIS PHP)
     const COSTO_DISENO = 10000;
 
-    // Aseguramos que solo usuarios autenticados puedan usar el carrito.
     public function __construct()
     {
         $this->middleware('auth'); 
     }
 
-    /**
-     * Obtiene el carrito activo del usuario actual o lo crea si no existe.
-     */
     protected function getOrCreateActiveCart()
     {
         return Carrito::firstOrCreate(
@@ -32,9 +27,6 @@ class CarritoController extends Controller
         );
     }
 
-    /**
-     * Muestra el contenido del carrito del cliente.
-     */
     public function index()
     {
         $carrito = $this->getOrCreateActiveCart();
@@ -50,70 +42,75 @@ class CarritoController extends Controller
      */
     public function store(Request $request)
     {
-        // Determinamos la fuente analizando los datos que trae el request.
-        // Si tiene 'opcion_archivo' (radio button), viene del Catálogo (show.blade.php).
-        $isFromCatalogo = $request->has('opcion_archivo');
+        // 1. Detección de Origen: Se asume Catálogo si producto_id está lleno.
+        $isFromCatalogo = $request->filled('producto_id') && $request->has('opcion_archivo');
         
-        // 1. Lógica de Validación Inteligente (Validación Condicional)
+        // 2. Lógica de Validación Inteligente (Validación Condicional)
         $rules = [
-            'cotizacion_id' => 'required|numeric', 
             'cantidad' => 'required|integer|min:1',
-            
-            // Reglas específicas para el Catálogo (Obligatorio en Catálogo)
             'opcion_archivo' => 'nullable|in:subir,diseno', 
+            'requiere_diseno' => 'nullable|boolean',
             
-            // Reglas condicionales: Requeridas SOLO si NO viene del Catálogo
+            // Si es Catálogo: producto_id es requerido, cotizacion_id es opcional (null)
+            'producto_id' => $isFromCatalogo ? 'required|exists:productos,id' : 'nullable|numeric', 
+            
+            // Si es Cotizador: cotizacion_id es requerido, producto_id es opcional (null)
+            'cotizacion_id' => $isFromCatalogo ? 'nullable|numeric' : 'required|exists:cotizaciones,id',
+            
+            // Medidas/Costo Final son requeridos SOLO por el Cotizador
             'ancho' => $isFromCatalogo ? 'nullable|numeric' : 'required|numeric|min:0.01',
             'alto' => $isFromCatalogo ? 'nullable|numeric' : 'required|numeric|min:0.01',
             'costo_final' => $isFromCatalogo ? 'nullable|numeric' : 'required|numeric|min:0',
-            
-            'requiere_diseno' => 'nullable|boolean',
         ];
 
         $validated = $request->validate($rules);
         
-        // 2. Obtener datos base y carrito
+        // 3. Inicialización y Búsqueda
         $carrito = $this->getOrCreateActiveCart();
-        $cotizacionBase = Cotizacion::find($validated['cotizacion_id']);
-        
         $ancho = $validated['ancho'] ?? 0;
         $alto = $validated['alto'] ?? 0;
         $subtotalCalculado = 0;
         $requiereDiseno = false;
         
-        // 3. DETERMINACIÓN DE LA FUENTE Y CÁLCULO
+        // El ID del producto o cotización que vamos a guardar
+        $finalProductoId = $validated['producto_id'] ?? null;
+        $finalCotizacionId = $validated['cotizacion_id'] ?? null;
         
-        // Caso A: VIENE DEL COTIZADOR (Tiene medidas/costo_final requeridos)
-        if (!$isFromCatalogo) {
-            $subtotalCalculado = $validated['costo_final'];
-            $requiereDiseno = (bool)($validated['requiere_diseno'] ?? false); 
-
-        // Caso B: VIENE DEL CATÁLOGO (Usamos el producto asociado a la cotización base)
-        } elseif ($cotizacionBase && $cotizacionBase->producto_id) {
-            $producto = Producto::find($cotizacionBase->producto_id);
-            if (!$producto) {
-                return back()->with('error', 'El producto asociado al catálogo no existe.');
-            }
+        // 4. CÁLCULO Y ASIGNACIÓN
+        
+        if ($isFromCatalogo) {
+            // A. FLUJO DE CATÁLOGO
             
-            // El campo que llega del Catálogo es 'opcion_archivo'
+            $producto = Producto::find($finalProductoId);
+            if (!$producto) { return back()->with('error', 'Producto de Catálogo no encontrado.'); }
+
             $requiereDiseno = ($validated['opcion_archivo'] === 'diseno');
             $costoDiseno = $requiereDiseno ? self::COSTO_DISENO : 0;
             
-            // Cálculo: (Precio de Catálogo * Cantidad) + Costo Diseño
             $subtotalCalculado = ($producto->precio * $validated['cantidad']) + $costoDiseno;
+            $ancho = $alto = 0;
             
-            // Forzar medidas a 0 para el Catálogo
-            $ancho = 0;
-            $alto = 0;
+            // 🚨 AJUSTE: Buscamos un ID de cotización para la FK (debe ser nullable en Items_Carrito)
+            $cotizacionBase = Cotizacion::where('producto_id', $finalProductoId)->first();
+            $finalCotizacionId = $cotizacionBase->id ?? null; // Usamos el ID del registro Cotización si existe
+            
         } else {
-             // Fallback: Si el ID no es ni Cotización completa, ni Producto de Catálogo
-             return back()->with('error', 'No se pudo determinar el origen del pedido o el ID es inválido.');
+            // B. FLUJO DE COTIZADOR
+            
+            $cotizacionBase = Cotizacion::find($finalCotizacionId);
+            if (!$cotizacionBase) { return back()->with('error', 'Cotización base no encontrada.'); }
+
+            $subtotalCalculado = $validated['costo_final'];
+            $requiereDiseno = (bool)($validated['requiere_diseno'] ?? false);
+            
+            $finalProductoId = null; // Aseguramos que la FK de producto sea nula
         }
 
-        // 4. Crear el ítem del carrito
+        // 5. Creación del Ítem (Solo uno de los IDs estará lleno)
         ItemCarrito::create([
             'carrito_id' => $carrito->id,
-            'cotizacion_id' => $validated['cotizacion_id'],
+            'cotizacion_id' => $finalCotizacionId, 
+            'producto_id' => $finalProductoId, 
             'ancho' => $ancho, 
             'alto' => $alto,  
             'cantidad' => $validated['cantidad'],
@@ -121,13 +118,9 @@ class CarritoController extends Controller
             'requiere_diseno' => $requiereDiseno,
         ]);
 
-        // 5. Redirigir (¡Ahora sí debe funcionar la navegación!)
         return redirect()->route('carrito.index')->with('success', 'Ítem añadido al carrito.');
     }
 
-    /**
-     * Elimina un ítem específico del carrito.
-     */
     public function destroy(ItemCarrito $item)
     {
         if ($item->carrito->usuario_id !== Auth::id() || $item->carrito->estado !== 'activo') {

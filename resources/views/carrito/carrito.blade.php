@@ -74,9 +74,17 @@
                                     @if ($esCotizado)
                                         {{ $item->ancho }}m x {{ $item->alto }}m | Cant: {{ $item->cantidad }}
                                     @else
-                                        Cant: {{ $item->cantidad }} (Precio Unitario: ${{ number_format($item->cotizacion->valor, 0, ',', '.') }})
-                                    @endif
-                                </p>
+                                            {{-- 🚨 CORRECCIÓN CLAVE: Usamos la relación 'producto' si existe, si no, usamos 'cotizacion' con precaución --}}
+                                            Cant: {{ $item->cantidad }} (Precio Unitario: ${{ 
+                                                number_format(
+                                                    $item->producto->precio ?? $item->cotizacion->valor ?? 0, 
+                                                    0, 
+                                                    ',', 
+                                                    '.'
+                                                ) 
+                                            }})
+                                        @endif
+                                    </p>
                                 
                                 <p class="text-sm {{ $item->requiere_diseno ? 'text-red-600' : 'text-gray-500' }} font-semibold mt-1">
                                     Diseño Gráfico: {{ $item->requiere_diseno ? 'Sí (+ $10.000 Incluido)' : 'No Requerido' }}
