@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ class Carrito extends Model
 
     protected $fillable = [
         'usuario_id',
-        'estado', // Ej: 'activo', 'comprado'
+        'estado',
     ];
 
     /**
@@ -20,7 +21,6 @@ class Carrito extends Model
      */
     public function usuario()
     {
-        // Asume que el modelo de usuario por defecto sigue siendo 'User'
         return $this->belongsTo(User::class);
     }
 

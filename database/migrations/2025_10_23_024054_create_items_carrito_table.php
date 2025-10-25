@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Ejecuta las migraciones.
+     * Run the migrations.
      */
     public function up(): void
     {
@@ -19,12 +19,12 @@ return new class extends Migration
             // Clave foránea a la Cotización (Define el producto y precio base)
             $table->foreignId('cotizacion_id')->constrained('cotizaciones')->onDelete('cascade');
             
-            // Datos del cálculo de cotización que fueron añadidos
-            $table->float('ancho');
-            $table->float('alto');
+            // Datos del cálculo de cotización
+            $table->float('ancho')->nullable();
+            $table->float('alto')->nullable();
             $table->integer('cantidad');
             
-            // Valor final calculado en el cotizador
+            // Valor final calculado (el subtotal del ítem)
             $table->decimal('costo_final', 10, 2); 
             $table->boolean('requiere_diseno')->default(false); // Si se marcó la opción de diseño
 

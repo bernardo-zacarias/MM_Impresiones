@@ -13,11 +13,23 @@
             ← Volver al Catálogo
         </a>
 
+        {{-- 🚨 CRÍTICO: Bloque para mostrar errores de validación --}}
+        @if ($errors->any())
+            <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg mt-6 mb-6 shadow-md">
+                <p class="font-bold mb-2">⚠️ Por favor, corrige los siguientes errores:</p>
+                <ul class="list-disc ml-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
             
             <div>
                 <img 
-                    src="{{ $producto->imagen ?? 'https://via.placeholder.com/600x400?text=Sin+Imagen' }}" 
+                    src="{{ $producto->imagen ?? 'https://picsum.photos/600/400' }}" 
                     alt="{{ $producto->nombre }}" 
                     class="w-full rounded-lg shadow-xl mb-6"
                 >
@@ -46,24 +58,28 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-4">Añadir al Carrito</h3>
                     <form action="{{ route('carrito.store') }}" method="POST" class="space-y-4">
                         @csrf
-                        <input type="hidden" name="producto_id" value="{{ $producto->id }}">
-                        <input type="hidden" name="costo_unitario" value="{{ $producto->precio }}">
+                        
+                        <input type="hidden" name="cotizacion_id" value="{{ $producto->id }}">
+                        
+                        <input type="hidden" name="ancho" value="">
+                        <input type="hidden" name="alto" value="">
+                        <input type="hidden" name="costo_final" value="">
 
                         <div>
                             <label for="cantidad" class="block text-sm font-medium text-gray-700">Cantidad</label>
-                            <input type="number" name="cantidad" id="cantidad" min="1" max="{{ $producto->stock }}" value="1" 
+                            <input type="number" name="cantidad" id="cantidad" min="1" max="{{ $producto->stock }}" value="{{ old('cantidad', 1) }}" 
                                    class="mt-1 block w-full border-gray-300 rounded-lg p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                             @error('cantidad')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                         </div>
 
                         <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-3">
-                            <label class="block text-sm font-medium text-gray-700">Opciones de Archivo (Obligatorio)</label>
+                            <label class="block text-sm font-medium text-gray-700">Opciones de Archivo (Selección obligatoria)</label>
                             
                             <div class="flex items-center">
                                 <input type="radio" id="subir_archivo" name="opcion_archivo" value="subir" 
                                        class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
                                 <label for="subir_archivo" class="ml-2 text-sm font-medium text-gray-700">
-                                    Subir mi propio archivo de diseño (No se aplica costo)
+                                    Yo proporciono el archivo de impresión (Sin costo adicional)
                                 </label>
                             </div>
 
