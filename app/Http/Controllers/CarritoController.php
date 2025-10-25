@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; // ¡Necesario para guardar archivos!
 use App\Models\Carrito;
 use App\Models\ItemCarrito;
 use App\Models\Cotizacion;
@@ -38,75 +39,75 @@ class CarritoController extends Controller
     }
 
     /**
-     * Agrega un ítem al carrito, manejando datos del Catálogo y del Cotizador.
+     * Agrega un ítem al carrito, manejando datos del Catálogo, Cotizador, y Archivo.
      */
     public function store(Request $request)
     {
-        // 1. Detección de Origen: Se asume Catálogo si producto_id está lleno.
         $isFromCatalogo = $request->filled('producto_id') && $request->has('opcion_archivo');
         
-        // 2. Lógica de Validación Inteligente (Validación Condicional)
+        // 1. Lógica de Validación Inteligente (Validación Condicional)
         $rules = [
+            'cotizacion_id' => 'required|numeric', 
             'cantidad' => 'required|integer|min:1',
             'opcion_archivo' => 'nullable|in:subir,diseno', 
             'requiere_diseno' => 'nullable|boolean',
             
-            // Si es Catálogo: producto_id es requerido, cotizacion_id es opcional (null)
+            // Reglas de IDs condicionales
             'producto_id' => $isFromCatalogo ? 'required|exists:productos,id' : 'nullable|numeric', 
-            
-            // Si es Cotizador: cotizacion_id es requerido, producto_id es opcional (null)
             'cotizacion_id' => $isFromCatalogo ? 'nullable|numeric' : 'required|exists:cotizaciones,id',
             
             // Medidas/Costo Final son requeridos SOLO por el Cotizador
             'ancho' => $isFromCatalogo ? 'nullable|numeric' : 'required|numeric|min:0.01',
             'alto' => $isFromCatalogo ? 'nullable|numeric' : 'required|numeric|min:0.01',
             'costo_final' => $isFromCatalogo ? 'nullable|numeric' : 'required|numeric|min:0',
+            
+            // 🚨 VALIDACIÓN DEL ARCHIVO
+            'archivo_diseno' => ['nullable', 'file', 'mimes:jpeg,png,pdf,ai,psd,zip', 'max:10240'], // Max 10MB
         ];
 
         $validated = $request->validate($rules);
         
-        // 3. Inicialización y Búsqueda
+        // 2. Inicialización, CÁLCULO y ASIGNACIÓN
         $carrito = $this->getOrCreateActiveCart();
         $ancho = $validated['ancho'] ?? 0;
         $alto = $validated['alto'] ?? 0;
         $subtotalCalculado = 0;
         $requiereDiseno = false;
         
-        // El ID del producto o cotización que vamos a guardar
         $finalProductoId = $validated['producto_id'] ?? null;
         $finalCotizacionId = $validated['cotizacion_id'] ?? null;
-        
-        // 4. CÁLCULO Y ASIGNACIÓN
-        
-        if ($isFromCatalogo) {
-            // A. FLUJO DE CATÁLOGO
-            
-            $producto = Producto::find($finalProductoId);
-            if (!$producto) { return back()->with('error', 'Producto de Catálogo no encontrado.'); }
+        $rutaArchivo = null; // Inicializamos la ruta del archivo
 
-            $requiereDiseno = ($validated['opcion_archivo'] === 'diseno');
-            $costoDiseno = $requiereDiseno ? self::COSTO_DISENO : 0;
-            
-            $subtotalCalculado = ($producto->precio * $validated['cantidad']) + $costoDiseno;
-            $ancho = $alto = 0;
-            
-            // 🚨 AJUSTE: Buscamos un ID de cotización para la FK (debe ser nullable en Items_Carrito)
-            $cotizacionBase = Cotizacion::where('producto_id', $finalProductoId)->first();
-            $finalCotizacionId = $cotizacionBase->id ?? null; // Usamos el ID del registro Cotización si existe
-            
-        } else {
-            // B. FLUJO DE COTIZADOR
-            
+        // 3. LÓGICA DE CÁLCULO
+        if (!$isFromCatalogo) {
+            // A. FLUJO DE COTIZADOR
             $cotizacionBase = Cotizacion::find($finalCotizacionId);
             if (!$cotizacionBase) { return back()->with('error', 'Cotización base no encontrada.'); }
 
             $subtotalCalculado = $validated['costo_final'];
             $requiereDiseno = (bool)($validated['requiere_diseno'] ?? false);
             
-            $finalProductoId = null; // Aseguramos que la FK de producto sea nula
+        } else {
+            // B. FLUJO DE CATÁLOGO
+            $producto = Producto::find($finalProductoId);
+            if (!$producto) { return back()->with('error', 'Producto de Catálogo no encontrado.'); }
+            
+            $requiereDiseno = ($validated['opcion_archivo'] === 'diseno');
+            $costoDiseno = $requiereDiseno ? self::COSTO_DISENO : 0;
+            $subtotalCalculado = ($producto->precio * $validated['cantidad']) + $costoDiseno;
+            $ancho = $alto = 0;
+            
+            $cotizacionBase = Cotizacion::where('producto_id', $finalProductoId)->first();
+            $finalCotizacionId = $cotizacionBase->id ?? null;
         }
 
-        // 5. Creación del Ítem (Solo uno de los IDs estará lleno)
+        // 4. GUARDAR ARCHIVO
+        if ($request->hasFile('archivo_diseno')) {
+            // Guarda el archivo en storage/app/public/disenos_clientes (se crea si no existe)
+            $rutaArchivo = $request->file('archivo_diseno')->store('disenos_clientes', 'public');
+        }
+
+        // 5. Creación del Ítem (Guardando la ruta)
         ItemCarrito::create([
             'carrito_id' => $carrito->id,
             'cotizacion_id' => $finalCotizacionId, 
@@ -116,6 +117,7 @@ class CarritoController extends Controller
             'cantidad' => $validated['cantidad'],
             'costo_final' => $subtotalCalculado,
             'requiere_diseno' => $requiereDiseno,
+            'ruta_archivo' => $rutaArchivo, // 🚨 GUARDAMOS LA RUTA AQUÍ
         ]);
 
         return redirect()->route('carrito.index')->with('success', 'Ítem añadido al carrito.');
@@ -123,6 +125,7 @@ class CarritoController extends Controller
 
     public function destroy(ItemCarrito $item)
     {
+        // ... (se mantiene igual)
         if ($item->carrito->usuario_id !== Auth::id() || $item->carrito->estado !== 'activo') {
              return back()->with('error', 'El ítem no pertenece a tu carrito activo.');
         }

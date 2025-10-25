@@ -37,13 +37,15 @@ class LoginController extends Controller
             }
             
             // Si es 'cliente' o cualquier otro rol
-            return redirect()->intended('/home');
+            return redirect()->intended('/');
         }
 
         return back()->withErrors([
             'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
         ])->onlyInput('email');
     }
+
+    
     
     // El Logout ya fue definido en web.php
 }

@@ -23,7 +23,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'rol', // <-- ESTO ES LO QUE NECESITAMOS AÑADIR
+        'rol', 
+        'telefono',
+        'comuna',
+        'ciudad',
     ];
 
     /**
