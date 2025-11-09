@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotizador de Trabajos - MM Impresiones</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
 @extends('layouts.app')
 
-<body class="bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen">
+@section('title', 'Catálogo de Productos')
+
+{{-- Usamos la sección 'content' para el diseño principal --}}
+@section('content')
+
+
 
     <div class="max-w-7xl mx-auto p-8">
 
@@ -337,6 +334,7 @@
             </div>
         </div>
     </div>
+@endsection
 
     <script>
         const COSTO_DISENO_BASE = 10000;

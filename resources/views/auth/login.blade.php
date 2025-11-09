@@ -1,12 +1,16 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+@extends('layouts.app')
+
+@section('title', 'Catálogo de Productos')
+
+{{-- Usamos la sección 'content' para el diseño principal --}}
+@section('content')
+    <div class="flex flex-col items-center justify-center min-h-screen -mt-10">
+    <div class="w-full max-w-md mx-auto p-8 bg-white rounded-3xl shadow-2xl border border-gray-100 transform transition-all duration-300 hover:shadow-3xl">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Bienvenido</h1>
+            <p class="text-gray-500">Ingresa a tu cuenta de MM Impresiones.</p>
+        </div>
 
     <div class="bg-white p-10 rounded-xl shadow-2xl w-full max-w-md">
         <h1 class="text-3xl font-extrabold text-indigo-600 text-center mb-6">Iniciar Sesión</h1>
@@ -48,5 +52,4 @@
         </p>
 
     </div>
-</body>
-</html>
+@endsection

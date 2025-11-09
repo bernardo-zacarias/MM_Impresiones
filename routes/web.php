@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CotizadorController;
 use App\Http\Controllers\CatalogoController; 
 use App\Http\Controllers\CarritoController; // ¡Importación crucial para el Carrito!
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PedidoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +73,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/carrito', [CarritoController::class, 'store'])->name('carrito.store');
     // destroy: Para eliminar un ítem específico del carrito
     Route::delete('/carrito/{item}', [CarritoController::class, 'destroy'])->name('carrito.destroy'); 
+    // RUTA DE CHECKOUT
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    // RUTAS DE PEDIDOS (HISTORIAL DE COMPRAS)
+    Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
+    Route::get('/pedidos/{pedido}', [PedidoController::class, 'show'])->name('pedidos.show');
+});
+
+// RUTAS DE PERFIL DE USUARIO
+Route::middleware(['auth'])->group(function () {
+    // Mostrar perfil
+    Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'show'])->name('perfil.show');
+    // Formulario de edición
+    Route::get('/perfil/editar', [App\Http\Controllers\ProfileController::class, 'edit'])->name('perfil.edit');
+    // Actualizar perfil
+    Route::put('/perfil', [App\Http\Controllers\ProfileController::class, 'update'])->name('perfil.update');
 });
 
 

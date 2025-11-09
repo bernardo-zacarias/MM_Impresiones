@@ -1,18 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Categorías</title>
-    <!-- CDN Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
-    </style>
-</head>
-<body class="p-8">
+@extends('layouts.app')
 
-    <!-- Mensaje de éxito al crear/editar/eliminar -->
+@section('title', 'Gestión de Categorías')
+
+@section('content')
+
     @if (session('success'))
         <div class="max-w-6xl mx-auto bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative mb-6 shadow-md" role="alert">
             <strong class="font-bold">¡Éxito!</strong>
@@ -29,7 +20,6 @@
         </div>
 
         <div class="overflow-x-auto">
-            <!-- La variable $categorias debe ser pasada desde el CategoriaController::index -->
             @isset($categorias)
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
@@ -49,7 +39,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a href="{{ route('administracion.categorias.edit', $categoria->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</a>
                                     
-                                    <form action="{{ route('administracion.categorias.destroy', $categoria->id) }}" method="POST" class="inline-block" >
+                                    <form action="{{ route('administracion.categorias.destroy', $categoria->id) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta categoría? Esto podría afectar a los productos asociados.');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900">Eliminar</button>
@@ -70,12 +60,11 @@
             @endisset
         </div>
 
-        <!-- Paginación (si el controlador usa paginate()) -->
         @if (isset($categorias) && $categorias->hasPages())
             <div class="mt-4">
                 {{ $categorias->links() }}
             </div>
         @endif
     </div>
-</body>
-</html>
+
+@endsection

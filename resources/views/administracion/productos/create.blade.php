@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Producto</title>
-    <!-- CDN Tailwind CSS: DEBE ESTAR EN TU LAYOUT PRINCIPAL -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
-    </style>
-</head>
-<body class="p-8">
+@extends('layouts.app')
+
+@section('title', 'Crear Nuevo Producto')
+
+@section('content')
 
     <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-2xl">
         <div class="flex justify-between items-center mb-8 border-b pb-4">
@@ -30,17 +22,16 @@
             </div>
         @endif
 
-        <form action="{{ route('administracion.productos.store') }}" method="POST">
+        {{-- CAMBIO CLAVE 1: Agregamos enctype="multipart/form-data" para permitir la subida de archivos --}}
+        <form action="{{ route('administracion.productos.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Nombre -->
                 <div>
                     <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto</label>
                     <input type="text" name="nombre" id="nombre" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" value="{{ old('nombre') }}" required>
                 </div>
 
-                <!-- Categoría -->
                 <div>
                     <label for="categoria_id" class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
                     <select name="categoria_id" id="categoria_id" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" required>
@@ -53,28 +44,31 @@
                     </select>
                 </div>
 
-                <!-- Precio -->
                 <div>
                     <label for="precio" class="block text-sm font-medium text-gray-700 mb-1">Precio ($)</label>
                     <input type="number" step="0.01" name="precio" id="precio" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" value="{{ old('precio') }}" required>
                 </div>
 
-                <!-- Stock -->
                 <div>
                     <label for="stock" class="block text-sm font-medium text-gray-700 mb-1">Stock</label>
                     <input type="number" name="stock" id="stock" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" value="{{ old('stock', 0) }}" required>
                 </div>
 
-                <!-- Descripción -->
                 <div class="md:col-span-2">
                     <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
                     <textarea name="descripcion" id="descripcion" rows="4" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500">{{ old('descripcion') }}</textarea>
                 </div>
 
-                <!-- Imagen (Campo simulado, se necesitaría configuración para la subida) -->
+                {{-- CAMBIO CLAVE 2: Reemplazamos el input de texto por input type="file" --}}
                 <div class="md:col-span-2">
-                    <label for="imagen" class="block text-sm font-medium text-gray-700 mb-1">URL de Imagen (Opcional)</label>
-                    <input type="text" name="imagen" id="imagen" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500" value="{{ old('imagen') }}">
+                    <label for="imagen" class="block text-sm font-medium text-gray-700 mb-1">Subir Imagen del Producto (Opcional, Max 2MB)</label>
+                    <input 
+                        type="file" 
+                        name="imagen" 
+                        id="imagen" 
+                        accept=".jpeg,.png,.jpg,.gif,.svg"
+                        class="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-indigo-500 focus:border-indigo-500"
+                    >
                 </div>
             </div>
 
@@ -85,5 +79,5 @@
             </div>
         </form>
     </div>
-</body>
-</html>
+    
+@endsection

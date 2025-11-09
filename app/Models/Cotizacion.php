@@ -25,6 +25,12 @@ class Cotizacion extends Model
         'notas_cotizacion',
         'usuario_id',
         'producto_id', 
+        
+        // ¡AGREGADOS PARA LA SOLICITUD DE COTIZACIÓN DEL CLIENTE!
+        'ancho', 
+        'alto',
+        'cantidad',
+        'estado', 
     ];
 
     // Casteo de tipos
@@ -32,6 +38,9 @@ class Cotizacion extends Model
         'valor' => 'float',
         'margen_porcentaje' => 'float',
         'fecha_validez' => 'date',
+        'ancho' => 'float', // Casteo de dimensiones
+        'alto' => 'float', // Casteo de dimensiones
+        'cantidad' => 'integer', // Casteo de cantidad
     ];
 
     // =======================================================
@@ -70,5 +79,14 @@ class Cotizacion extends Model
     {
         // Una cotización fue creada por un usuario (usuario_id)
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relación: Una cotización puede tener varios archivos de diseño.
+     * Asumiendo que has creado la relación en el modelo Archivo.php
+     */
+    public function archivos()
+    {
+        return $this->hasMany(\App\Models\Archivo::class);
     }
 }

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Administracion;
 
 use App\Http\Controllers\Controller;
-use App\Models\Producto; // Importamos el Modelo Producto
-use App\Models\Categoria; // Importamos el Modelo Categoria
+use App\Models\Producto;
+use App\Models\Categoria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // AGREGADO: Para gestión de archivos
 
 class ProductoController extends Controller
 {
@@ -14,7 +15,6 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        // Paginamos para evitar cargar demasiados datos
         $productos = Producto::with('categoria')->paginate(10); 
         return view('administracion.productos.index', compact('productos'));
     }
@@ -24,7 +24,6 @@ class ProductoController extends Controller
      */
     public function create()
     {
-        // Necesitamos todas las categorías para el menú desplegable (dropdown)
         $categorias = Categoria::all(); 
         return view('administracion.productos.create', compact('categorias'));
     }
@@ -40,11 +39,22 @@ class ProductoController extends Controller
             'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'imagen' => 'nullable|string|url', // Asumiendo URL de imagen por simplicidad
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // MODIFICADO para subir archivo
             'categoria_id' => 'required|exists:categorias,id',
         ]);
 
-        Producto::create($request->all());
+        $data = $request->all();
+
+        // Lógica de subida de imagen
+        if ($request->hasFile('imagen')) {
+            // Guarda el archivo en storage/app/public/productos
+            $rutaImagen = $request->file('imagen')->store('productos', 'public');
+            $data['imagen'] = $rutaImagen; // Guarda la ruta relativa en la base de datos
+        } else {
+             $data['imagen'] = null;
+        }
+
+        Producto::create($data); 
 
         return redirect()->route('administracion.productos.index')
                          ->with('success', 'Producto creado exitosamente.');
@@ -72,17 +82,37 @@ class ProductoController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
-        // Validación de datos, ignorando el nombre del producto actual en la validación unique
+        // Validación de datos
         $request->validate([
             'nombre' => 'required|string|max:255|unique:productos,nombre,'.$producto->id,
             'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'imagen' => 'nullable|string|url',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // MODIFICADO
             'categoria_id' => 'required|exists:categorias,id',
         ]);
 
-        $producto->update($request->all());
+        $data = $request->all();
+
+        // Lógica de subida de imagen
+        if ($request->hasFile('imagen')) {
+            // 1. Eliminar la imagen antigua si existe
+            if ($producto->imagen) {
+                Storage::disk('public')->delete($producto->imagen);
+            }
+            
+            // 2. Guardar la nueva imagen
+            $rutaImagen = $request->file('imagen')->store('productos', 'public');
+            $data['imagen'] = $rutaImagen;
+        } else if ($request->input('delete_imagen') == 1) { // Lógica para eliminar la imagen
+            if ($producto->imagen) {
+                Storage::disk('public')->delete($producto->imagen);
+            }
+            $data['imagen'] = null; // Establecer el campo en NULL en la base de datos
+        }
+
+
+        $producto->update($data);
 
         return redirect()->route('administracion.productos.index')
                          ->with('success', 'Producto actualizado exitosamente.');
@@ -93,6 +123,11 @@ class ProductoController extends Controller
      */
     public function destroy(Producto $producto)
     {
+        // Lógica para eliminar la imagen asociada al producto
+        if ($producto->imagen) {
+            Storage::disk('public')->delete($producto->imagen);
+        }
+        
         $producto->delete();
 
         return redirect()->route('administracion.productos.index')

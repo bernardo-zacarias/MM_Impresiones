@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras - MM Impresiones</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
 @extends('layouts.app')
 
-<body class="bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen">
+@section('title', 'Catálogo de Productos')
+
+{{-- Usamos la sección 'content' para el diseño principal --}}
+@section('content')
 
     <div class="max-w-7xl mx-auto p-8">
         <!-- Header -->
@@ -227,21 +222,13 @@
                             </div>
 
                             <!-- Botón de Pago -->
-                            <button 
-                                onclick="alert('Redirigiendo a tu pasarela de pago (ej. Mercado Pago, Transbank) con un total de ${{ number_format($granTotal, 0, ',', '.') }}.')" 
-                                class="group relative block w-full overflow-hidden rounded-xl bg-gradient-to-br from-green-600 via-green-500 to-emerald-600 p-0.5 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]">
-                                <div class="relative bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl overflow-hidden">
-                                    <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    <div class="relative px-8 py-4 flex items-center justify-center gap-3">
-                                        <svg class="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                                        </svg>
-                                        <span class="text-xl font-bold text-white">
-                                            Proceder al Pago
-                                        </span>
-                                    </div>
-                                </div>
-                            </button>
+                            <form action="{{ route('checkout.store') }}" method="POST">
+                                @csrf
+                                <button type="submit" 
+                                    class="w-full mt-6 bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition duration-150 shadow-lg">
+                                    Pagar Ahora
+                                </button>
+                            </form>
 
                             <!-- Botón Seguir Comprando -->
                             <a href="{{ route('catalogo.index') }}" class="block w-full text-center px-6 py-3 border-2 border-indigo-600 text-indigo-600 font-bold rounded-xl hover:bg-indigo-50 transition-all duration-300 flex items-center justify-center gap-2">
@@ -269,5 +256,5 @@
             </div>
         @endif
     </div>
-</body>
+@endsection
 </html>

@@ -1,20 +1,14 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - MM Impresiones</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
 @extends('layouts.app')
 
-<body class="bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen">
+@section('title', 'Catálogo de Productos')
 
+{{-- Usamos la sección 'content' para el diseño principal --}}
+@section('content')
+    
     <div class="max-w-7xl mx-auto p-8">
         
-        <!-- Mensajes de Éxito/Error -->
         @if (session('success'))
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 px-6 py-4 rounded-xl relative mb-8 shadow-lg animate-fade-in">
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 px-6 py-4 rounded-xl relative mb-8 shadow-lg">
                 <div class="flex items-center gap-3">
                     <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -36,17 +30,14 @@
         @endif
 
         @auth
-            <!-- Header del Perfil -->
             <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 mb-8">
                 <div class="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 p-8 relative overflow-hidden">
-                    <!-- Decoración de fondo -->
                     <div class="absolute inset-0 opacity-10">
                         <div class="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 -translate-y-32"></div>
                         <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-32 translate-y-32"></div>
                     </div>
 
                     <div class="relative flex flex-col md:flex-row items-center gap-6">
-                        <!-- Avatar -->
                         <div class="relative">
                             <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-2xl border-4 border-white/50">
                                 <span class="text-5xl font-bold text-indigo-600">
@@ -60,7 +51,6 @@
                             </div>
                         </div>
 
-                        <!-- Información del Usuario -->
                         <div class="flex-1 text-center md:text-left">
                             <h1 class="text-4xl font-extrabold text-white mb-2">
                                 ¡Hola, {{ Auth::user()->name }}!
@@ -82,7 +72,6 @@
                             </div>
                         </div>
 
-                        <!-- Botones de Acción Rápida -->
                         <div class="flex flex-col gap-2">
                             <button class="px-6 py-2 bg-white text-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition-all shadow-lg flex items-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,13 +93,10 @@
                 </div>
             </div>
 
-            <!-- Grid de Contenido -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- Columna Izquierda: Información Personal -->
                 <div class="lg:col-span-1 space-y-6">
                     
-                    <!-- Card de Información Personal -->
                     <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-1 h-8 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></div>
@@ -153,7 +139,6 @@
                         </div>
                     </div>
 
-                    <!-- Card de Estadísticas -->
                     <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white">
                         <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,10 +168,8 @@
                     </div>
                 </div>
 
-                <!-- Columna Derecha: Acciones y Actividad -->
                 <div class="lg:col-span-2 space-y-6">
                     
-                    <!-- Accesos Rápidos -->
                     <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-1 h-8 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></div>
@@ -196,7 +179,6 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             
                             @if (Auth::user()->rol === 'admin')
-                                <!-- Botón Admin -->
                                 <a href="{{ route('administracion.categorias.index') }}" class="group relative block overflow-hidden rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-pink-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                                     <div class="relative bg-gradient-to-br from-red-600 to-pink-600 rounded-xl overflow-hidden">
                                         <div class="relative px-6 py-4 flex items-center gap-3">
@@ -216,7 +198,6 @@
                                 </a>
                             @endif
 
-                            <!-- Botón Catálogo -->
                             <a href="{{ route('catalogo.index') }}" class="group relative block overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-500 to-purple-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                                 <div class="relative bg-white rounded-xl overflow-hidden">
                                     <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -235,7 +216,6 @@
                                 </div>
                             </a>
 
-                            <!-- Botón Cotizador -->
                             <a href="{{ route('cotizador.index') }}" class="group relative block overflow-hidden rounded-xl bg-gradient-to-br from-purple-600 via-purple-500 to-pink-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                                 <div class="relative bg-white rounded-xl overflow-hidden">
                                     <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -254,7 +234,6 @@
                                 </div>
                             </a>
 
-                            <!-- Botón Carrito -->
                             <a href="{{ route('carrito.index') }}" class="group relative block overflow-hidden rounded-xl bg-gradient-to-br from-green-600 via-green-500 to-emerald-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                                 <div class="relative bg-white rounded-xl overflow-hidden">
                                     <div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -275,38 +254,56 @@
                         </div>
                     </div>
 
-                    <!-- Historial de Pedidos -->
                     <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center gap-3">
                                 <div class="w-1 h-8 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></div>
                                 <h2 class="text-2xl font-bold text-gray-800">Historial de Pedidos</h2>
                             </div>
-                            <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm flex items-center gap-1">
+                            <a href="{{ route('pedidos.index') }}" class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm flex items-center gap-1">
                                 Ver todos
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
-                            </button>
-                        </div>
-
-                        <!-- Estado Vacío -->
-                        <div class="text-center py-12">
-                            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                            </svg>
-                            <h3 class="text-xl font-bold text-gray-600 mb-2">No tienes pedidos aún</h3>
-                            <p class="text-gray-500 mb-6">Comienza a explorar nuestro catálogo</p>
-                            <a href="{{ route('catalogo.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                                </svg>
-                                Ver Productos
                             </a>
                         </div>
+
+                        @if (isset($pedidosRecientes) && $pedidosRecientes->count() > 0)
+                            <div class="space-y-3">
+                                @foreach ($pedidosRecientes as $pedido)
+                                    <a href="{{ route('pedidos.show', $pedido->id) }}" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded-lg flex justify-between items-center transition duration-150">
+                                        <div class="flex items-center gap-3">
+                                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01M9 13h.01"/>
+                                            </svg>
+                                            <div>
+                                                <p class="font-medium text-gray-800">Pedido N° {{ $pedido->id }}</p>
+                                                <p class="text-xs text-gray-500">{{ $pedido->created_at->diffForHumans() }}</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-semibold {{ $pedido->estado == 'pagado' ? 'text-green-600' : 'text-yellow-600' }}">
+                                            ${{ number_format($pedido->total, 0) }}
+                                        </span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-12">
+                                <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                </svg>
+                                <h3 class="text-xl font-bold text-gray-600 mb-2">No tienes pedidos aún</h3>
+                                <p class="text-gray-500 mb-6">Comienza a explorar nuestro catálogo</p>
+                                <a href="{{ route('catalogo.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                    </svg>
+                                    Ver Productos
+                                </a>
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- Cotizaciones Recientes -->
                     <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center gap-3">
@@ -315,26 +312,45 @@
                             </div>
                         </div>
 
-                        <!-- Estado Vacío -->
-                        <div class="text-center py-12">
-                            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <h3 class="text-xl font-bold text-gray-600 mb-2">No tienes cotizaciones</h3>
-                            <p class="text-gray-500 mb-6">Solicita un presupuesto personalizado</p>
-                            <a href="{{ route('cotizador.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        @if (isset($cotizacionesRecientes) && $cotizacionesRecientes->count() > 0)
+                            <div class="space-y-3">
+                                @foreach ($cotizacionesRecientes as $cotizacion)
+                                    <a href="{{ route('cotizaciones.show', $cotizacion->id) }}" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded-lg flex justify-between items-center transition duration-150">
+                                        <div class="flex items-center gap-3">
+                                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            <div>
+                                                <p class="font-medium text-gray-800">{{ Str::limit($cotizacion->nombre, 30) }}</p>
+                                                <p class="text-xs text-gray-500">Estado: {{ Str::title(str_replace('_', ' ', $cotizacion->estado)) }}</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-sm font-semibold {{ $cotizacion->estado == 'cotizado' ? 'text-blue-600' : 'text-gray-600' }}">
+                                            {{ $cotizacion->created_at->diffForHumans() }}
+                                        </span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center py-12">
+                                <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
-                                Solicitar Cotización
-                            </a>
-                        </div>
+                                <h3 class="text-xl font-bold text-gray-600 mb-2">No tienes cotizaciones</h3>
+                                <p class="text-gray-500 mb-6">Solicita un presupuesto personalizado</p>
+                                <a href="{{ route('cotizador.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                    </svg>
+                                    Solicitar Cotización
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
 
         @else
-            <!-- Contenido para usuarios NO autenticados -->
             <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
                 <div class="bg-gradient-to-br from-indigo-600 to-purple-600 p-16 text-center">
                     <div class="inline-block p-6 bg-white/20 rounded-3xl backdrop-blur-sm mb-6">
@@ -410,5 +426,4 @@
         @endauth
     </div>
 
-</body>
-</html>
+@endsection

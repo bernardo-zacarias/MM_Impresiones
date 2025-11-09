@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $producto->nombre }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen">
+@extends('layouts.app')
+
+@section('title', 'Catálogo de Productos')
+
+{{-- Usamos la sección 'content' para el diseño principal --}}
+@section('content')
 
     <div class="max-w-7xl mx-auto p-8">
         <a href="{{ route('catalogo.index') }}" class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold mb-8 group transition-all">
@@ -217,6 +211,8 @@
             </div>
         </div>
     </div>
+
+@endsection
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
