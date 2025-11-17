@@ -38,9 +38,10 @@
                     <div class="relative group mb-8">
                         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl transform group-hover:scale-105 transition-transform duration-300"></div>
                         <img 
-                            src="{{ $producto->imagen ?? 'https://picsum.photos/600/400' }}" 
+                            src="{{ $producto->imagen ? asset('storage/' . $producto->imagen) : 'https://via.placeholder.com/600x600?text=Sin+Imagen' }}" 
                             alt="{{ $producto->nombre }}" 
                             class="relative w-full rounded-2xl shadow-xl object-cover aspect-square"
+                            onerror="this.src='https://via.placeholder.com/600x600?text=Imagen+No+Disponible'"
                         >
                     </div>
 

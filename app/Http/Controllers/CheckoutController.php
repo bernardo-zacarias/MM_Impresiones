@@ -67,11 +67,8 @@ class CheckoutController extends Controller
             
             DB::commit();
 
-            // 7. Redirigir al cliente a la API de Pago
-            // 🚨 NOTA: Aquí iría la lógica real de integración con la API de pago (Mercado Pago, Flow, etc.)
-            // Por ahora, redirigimos a una página de confirmación con el ID del pedido.
-            return redirect()->route('pedidos.show', $pedido->id) 
-                             ->with('success', 'Pedido N°' . $pedido->id . ' creado. Redirigiendo a pago...');
+            // 7. Redirigir al cliente a Transbank para procesar el pago
+            return redirect()->route('transbank.iniciar', $pedido->id);
 
         } catch (\Exception $e) {
             DB::rollBack();

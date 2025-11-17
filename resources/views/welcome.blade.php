@@ -73,9 +73,10 @@
                 <div class="relative float-animation">
                     <div class="relative">
                         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl transform rotate-6"></div>
-                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop" 
-                             alt="Servicios de Impresión" 
-                             class="relative rounded-3xl shadow-2xl w-full">
+                        <img src="{{ asset(config('images.welcome_banner', config('images.home_bg'))) }}" 
+                             alt="Servicios de Impresión MM Impresiones" 
+                             class="relative rounded-3xl shadow-2xl w-full object-cover"
+                             onerror="this.src='{{ asset('/images/banners/home-bg.png') }}'">
                     </div>
                 </div>
             </div>

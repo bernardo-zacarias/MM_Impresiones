@@ -48,4 +48,28 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Relación: Un usuario tiene un carrito activo.
+     */
+    public function carrito()
+    {
+        return $this->hasOne(Carrito::class)->where('estado', 'activo');
+    }
+
+    /**
+     * Relación: Un usuario tiene muchos pedidos.
+     */
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class);
+    }
+
+    /**
+     * Relación: Un usuario tiene muchas cotizaciones.
+     */
+    public function cotizaciones()
+    {
+        return $this->hasMany(Cotizacion::class);
+    }
 }

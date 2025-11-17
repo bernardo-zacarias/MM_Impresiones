@@ -10,15 +10,6 @@ use App\Models\User;
 class ProfileController extends Controller
 {
     /**
-     * Mostrar el perfil del usuario autenticado.
-     */
-    public function show()
-    {
-        $user = Auth::user();
-        return view('profile.show', compact('user'));
-    }
-
-    /**
      * Mostrar el formulario de edición del perfil.
      */
     public function edit()
@@ -55,6 +46,6 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return redirect()->route('perfil.show')->with('success', 'Perfil actualizado correctamente.');
+        return redirect()->route('home')->with('success', 'Perfil actualizado correctamente.');
     }
 }

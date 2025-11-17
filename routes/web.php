@@ -29,13 +29,25 @@ Route::post('logout', function() {
     return redirect('/');
 })->name('logout');
 
+// Password Reset Routes
+Route::get('forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('forgot-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [App\Http\Controllers\Auth\PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [App\Http\Controllers\Auth\PasswordResetController::class, 'reset'])->name('password.update');
+
 
 // --- 2. Rutas Protegidas para el Administrador (Rol: admin)
 Route::middleware(['auth', 'role:admin'])->prefix('administracion')->name('administracion.')->group(function () {
     
     // DASHBOARD
     Route::get('/', function () {
-        return view('administracion.dashboard'); 
+        $stats = [
+            'categorias' => \App\Models\Categoria::count(),
+            'productos' => \App\Models\Producto::count(),
+            'pedidos_pendientes' => \App\Models\Pedido::whereIn('estado', ['pendiente', 'pagado', 'en_produccion'])->count(),
+            'clientes' => \App\Models\User::where('rol', 'cliente')->count(),
+        ];
+        return view('administracion.dashboard', compact('stats')); 
     })->name('dashboard'); 
 
     // CRUD para Categorias
@@ -43,6 +55,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('administracion')->name('admin
 
     // CRUD para Productos
     Route::resource('productos', ProductoController::class);
+    
+    // GESTIÓN DE PEDIDOS
+    Route::get('pedidos', [App\Http\Controllers\AdminPedidoController::class, 'index'])->name('pedidos.index');
+    Route::get('pedidos/{pedido}', [App\Http\Controllers\AdminPedidoController::class, 'show'])->name('pedidos.show');
+    Route::patch('pedidos/{pedido}/estado', [App\Http\Controllers\AdminPedidoController::class, 'updateEstado'])->name('pedidos.estado');
+    Route::post('pedidos/{pedido}/notas', [App\Http\Controllers\AdminPedidoController::class, 'agregarNotas'])->name('pedidos.notas');
+    Route::get('pedidos/{pedido}/archivos', [App\Http\Controllers\AdminPedidoController::class, 'descargarArchivos'])->name('pedidos.archivos');
+    
+    // GESTIÓN DE USUARIOS
+    Route::resource('usuarios', App\Http\Controllers\Administracion\UserController::class);
     
     // RUTAS DE PRECIOS DE COTIZACIÓN
     
@@ -78,17 +100,18 @@ Route::middleware(['auth'])->group(function () {
     // RUTAS DE PEDIDOS (HISTORIAL DE COMPRAS)
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
     Route::get('/pedidos/{pedido}', [PedidoController::class, 'show'])->name('pedidos.show');
-});
-
-// RUTAS DE PERFIL DE USUARIO
-Route::middleware(['auth'])->group(function () {
-    // Mostrar perfil
-    Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'show'])->name('perfil.show');
-    // Formulario de edición
+    
+    // RUTAS DE TRANSBANK (PAGOS)
+    Route::get('/pagar/{pedido}', [App\Http\Controllers\TransbankController::class, 'iniciarPago'])->name('transbank.iniciar');
+    
+    // RUTAS DE PERFIL DE USUARIO (solo edición)
     Route::get('/perfil/editar', [App\Http\Controllers\ProfileController::class, 'edit'])->name('perfil.edit');
-    // Actualizar perfil
     Route::put('/perfil', [App\Http\Controllers\ProfileController::class, 'update'])->name('perfil.update');
 });
+
+// RUTA PÚBLICA DE CALLBACK TRANSBANK (sin autenticación requerida)
+Route::post('/transbank/callback', [App\Http\Controllers\TransbankController::class, 'callback'])->name('transbank.callback');
+Route::get('/transbank/callback', [App\Http\Controllers\TransbankController::class, 'callback'])->name('transbank.callback.get');
 
 
 // =======================================================

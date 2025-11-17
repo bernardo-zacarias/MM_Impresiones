@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administración | Dashboard</title>
+    <title>@yield('title', 'Administración') | MM Impresiones</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-@extends('layouts.app')
 
 <body class="bg-gradient-to-br from-gray-50 to-indigo-50 min-h-screen">
 
@@ -50,20 +49,18 @@
             </a>
 
             <div class="pt-4 border-t border-gray-700">
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 rounded-xl font-medium cursor-not-allowed opacity-50">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('administracion.pedidos.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-xl font-medium transition-all group">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
                     Pedidos
-                    <span class="ml-auto text-xs bg-gray-700 px-2 py-1 rounded-full">Pronto</span>
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 rounded-xl font-medium cursor-not-allowed opacity-50">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('administracion.usuarios.index') }}" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-xl font-medium transition-all group">
+                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                     Usuarios
-                    <span class="ml-auto text-xs bg-gray-700 px-2 py-1 rounded-full">Pronto</span>
                 </a>
 
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-400 rounded-xl font-medium cursor-not-allowed opacity-50">
@@ -143,8 +140,8 @@
                             </svg>
                         </div>
                     </div>
-                    <p class="text-4xl font-extrabold text-gray-800 mb-1">0</p>
-                    <p class="text-sm text-gray-600 font-semibold">Categorías Activas</p>
+                    <p class="text-4xl font-extrabold text-gray-800 mb-1">{{ $stats['categorias'] ?? 0 }}</p>
+                    <p class="text-sm text-gray-600 font-semibold">Categorías Totales</p>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-pink-500 transform hover:scale-105 transition-all">
@@ -155,7 +152,7 @@
                             </svg>
                         </div>
                     </div>
-                    <p class="text-4xl font-extrabold text-gray-800 mb-1">0</p>
+                    <p class="text-4xl font-extrabold text-gray-800 mb-1">{{ $stats['productos'] ?? 0 }}</p>
                     <p class="text-sm text-gray-600 font-semibold">Productos Total</p>
                 </div>
 
@@ -167,7 +164,7 @@
                             </svg>
                         </div>
                     </div>
-                    <p class="text-4xl font-extrabold text-gray-800 mb-1">0</p>
+                    <p class="text-4xl font-extrabold text-gray-800 mb-1">{{ $stats['pedidos_pendientes'] ?? 0 }}</p>
                     <p class="text-sm text-gray-600 font-semibold">Pedidos Pendientes</p>
                 </div>
 
@@ -179,10 +176,58 @@
                             </svg>
                         </div>
                     </div>
-                    <p class="text-4xl font-extrabold text-gray-800 mb-1">0</p>
+                    <p class="text-4xl font-extrabold text-gray-800 mb-1">{{ $stats['clientes'] ?? 0 }}</p>
                     <p class="text-sm text-gray-600 font-semibold">Clientes Registrados</p>
                 </div>
             </div>
+
+            <!-- Notificaciones de Pedidos Pendientes -->
+            @php
+                $pedidosPendientes = \App\Models\Pedido::whereIn('estado', ['pendiente', 'pagado'])
+                    ->with('usuario')
+                    ->orderBy('created_at', 'desc')
+                    ->take(5)
+                    ->get();
+            @endphp
+            
+            @if($pedidosPendientes->count() > 0)
+                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-500 p-6 rounded-xl mb-8 shadow-lg">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 animate-pulse">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-yellow-800 mb-2">⚠️ Tienes {{ $pedidosPendientes->count() }} pedido(s) pendiente(s) de procesar</h3>
+                            <div class="space-y-2 mt-4">
+                                @foreach($pedidosPendientes as $pedido)
+                                    <div class="bg-white rounded-lg p-3 flex items-center justify-between shadow-sm hover:shadow-md transition-all">
+                                        <div>
+                                            <p class="font-semibold text-gray-800">Pedido #{{ $pedido->id }} - {{ $pedido->usuario->name }}</p>
+                                            <p class="text-sm text-gray-600">
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold
+                                                    {{ $pedido->estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800' }}">
+                                                    {{ ucfirst($pedido->estado) }}
+                                                </span>
+                                                - {{ $pedido->created_at->diffForHumans() }}
+                                            </p>
+                                        </div>
+                                        <a href="{{ route('administracion.pedidos.show', $pedido->id) }}" 
+                                           class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold">
+                                            Ver Detalles →
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <a href="{{ route('administracion.pedidos.index') }}" 
+                               class="inline-block mt-4 px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold">
+                                Ver Todos los Pedidos →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <!-- Accesos Rápidos -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

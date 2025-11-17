@@ -15,6 +15,20 @@ class Pedido extends Model
         'estado',
         'total',
         'metodo_pago',
+        'notas_cliente',
+        'notas_admin',
+        'transbank_token',
+        'transbank_authorization_code',
+        'transbank_buy_order',
+        'transbank_payment_type_code',
+        'transbank_amount',
+        'transbank_transaction_date',
+        'transbank_response',
+    ];
+
+    protected $casts = [
+        'transbank_response' => 'array',
+        'transbank_transaction_date' => 'datetime',
     ];
 
     /**

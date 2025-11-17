@@ -46,6 +46,10 @@
             </button>
         </form>
         
+        <p class="text-center text-sm text-gray-500 mt-4">
+            <a href="{{ route('password.request') }}" class="text-indigo-600 hover:text-indigo-800 font-medium">¿Olvidaste tu contraseña?</a>
+        </p>
+        
         <p class="text-center text-sm text-gray-500 mt-6">
             ¿No tienes cuenta? 
             <a href="{{ route('register') }}" class="text-indigo-600 hover:text-indigo-800 font-medium">Regístrate aquí</a>
