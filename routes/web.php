@@ -85,7 +85,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('administracion')->name('admin
 // Estas rutas requieren que el usuario haya iniciado sesión (middleware('auth'))
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', function () {
-        return view('home'); 
+        // Obtener pedidos recientes del usuario
+        $pedidosRecientes = \App\Models\Pedido::where('usuario_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+        
+        // Obtener estadísticas del usuario
+        $totalPedidos = \App\Models\Pedido::where('usuario_id', Auth::id())->count();
+        $totalGastado = \App\Models\Pedido::where('usuario_id', Auth::id())
+            ->where('estado', 'pagado')
+            ->sum('total');
+        
+        return view('home', compact('pedidosRecientes', 'totalPedidos', 'totalGastado')); 
     })->name('home');
     
     // RUTAS DEL CARRITO

@@ -14,6 +14,7 @@ class ItemPedido extends Model
         'pedido_id',
         'cotizacion_id', // ID del ítem cotizable
         'producto_id',   // ID del producto de catálogo
+        'producto_nombre', // Nombre del producto (guardado)
         'ancho',
         'alto',
         'cantidad',
@@ -26,6 +27,25 @@ class ItemPedido extends Model
         'requiere_diseno' => 'boolean',
         'costo_final' => 'float',
     ];
+    
+    // Atributo para obtener el nombre del producto
+    public function getProductoNombreAttribute($value)
+    {
+        // Si ya está guardado en la BD, usarlo
+        if ($value) {
+            return $value;
+        }
+        
+        // Si no, intentar obtenerlo de las relaciones
+        if ($this->producto_id && $this->producto) {
+            return $this->producto->nombre;
+        }
+        if ($this->cotizacion_id && $this->cotizacion) {
+            return $this->cotizacion->nombre;
+        }
+        
+        return 'Producto';
+    }
 
     public function pedido()
     {

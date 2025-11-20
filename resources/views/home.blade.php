@@ -75,6 +75,12 @@
                         </div>
 
                         <div class="flex flex-col gap-2">
+                            <a href="{{ url('/') }}" class="px-6 py-2 bg-white/90 backdrop-blur-sm text-indigo-600 rounded-xl font-semibold hover:bg-white transition-all shadow-lg flex items-center gap-2 group">
+                                <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                </svg>
+                                Página Principal
+                            </a>
                             <a href="{{ route('perfil.edit') }}" class="px-6 py-2 bg-white text-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition-all shadow-lg flex items-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -151,20 +157,20 @@
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
-                                <p class="text-3xl font-bold">0</p>
+                                <p class="text-3xl font-bold">{{ $totalPedidos ?? 0 }}</p>
                                 <p class="text-sm opacity-90">Pedidos</p>
                             </div>
                             <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
-                                <p class="text-3xl font-bold">$0</p>
+                                <p class="text-3xl font-bold">${{ number_format($totalGastado ?? 0, 0, ',', '.') }}</p>
                                 <p class="text-sm opacity-90">Gastado</p>
                             </div>
                             <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
-                                <p class="text-3xl font-bold">0</p>
-                                <p class="text-sm opacity-90">Cotizaciones</p>
+                                <p class="text-3xl font-bold">{{ ($pedidosRecientes ?? collect())->where('estado', 'pendiente_pago')->count() }}</p>
+                                <p class="text-sm opacity-90">Pendientes</p>
                             </div>
                             <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
-                                <p class="text-3xl font-bold">0</p>
-                                <p class="text-sm opacity-90">Favoritos</p>
+                                <p class="text-3xl font-bold">{{ ($pedidosRecientes ?? collect())->where('estado', 'pagado')->count() }}</p>
+                                <p class="text-sm opacity-90">Pagados</p>
                             </div>
                         </div>
                     </div>
@@ -180,8 +186,27 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             
+                            <!-- Botón para volver a la página principal -->
+                            <a href="{{ url('/') }}" class="group relative block overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                                <div class="relative bg-white rounded-xl overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="relative px-6 py-4 flex items-center gap-3">
+                                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                        </svg>
+                                        <div class="flex-1 text-left">
+                                            <p class="font-bold text-gray-800 text-lg">Página Principal</p>
+                                            <p class="text-gray-600 text-sm">Volver al inicio</p>
+                                        </div>
+                                        <svg class="w-6 h-6 text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </a>
+                            
                             @if (Auth::user()->rol === 'admin')
-                                <a href="{{ route('administracion.categorias.index') }}" class="group relative block overflow-hidden rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-pink-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                                <a href="{{ route('administracion.dashboard') }}" class="group relative block overflow-hidden rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-pink-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                                     <div class="relative bg-gradient-to-br from-red-600 to-pink-600 rounded-xl overflow-hidden">
                                         <div class="relative px-6 py-4 flex items-center gap-3">
                                             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,19 +298,43 @@
                         @if (isset($pedidosRecientes) && $pedidosRecientes->count() > 0)
                             <div class="space-y-3">
                                 @foreach ($pedidosRecientes as $pedido)
-                                    <a href="{{ route('pedidos.show', $pedido->id) }}" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded-lg flex justify-between items-center transition duration-150">
-                                        <div class="flex items-center gap-3">
-                                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01M9 13h.01"/>
-                                            </svg>
-                                            <div>
-                                                <p class="font-medium text-gray-800">Pedido N° {{ $pedido->id }}</p>
-                                                <p class="text-xs text-gray-500">{{ $pedido->created_at->diffForHumans() }}</p>
+                                    <a href="{{ route('pedidos.show', $pedido->id) }}" class="group block p-4 bg-gradient-to-r from-gray-50 to-white hover:from-indigo-50 hover:to-purple-50 rounded-xl border border-gray-200 hover:border-indigo-300 transition-all duration-200 hover:shadow-md">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex items-start gap-3 flex-1">
+                                                <div class="p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors">
+                                                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <div class="flex items-center gap-2 mb-1">
+                                                        <p class="font-bold text-gray-800 text-lg">Pedido #{{ $pedido->id }}</p>
+                                                        @if($pedido->estado == 'pagado')
+                                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">✓ Pagado</span>
+                                                        @elseif($pedido->estado == 'pendiente_pago')
+                                                            <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">⏳ Pendiente</span>
+                                                        @elseif($pedido->estado == 'en_produccion')
+                                                            <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">🔧 En Producción</span>
+                                                        @elseif($pedido->estado == 'completado')
+                                                            <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">📦 Completado</span>
+                                                        @elseif($pedido->estado == 'entregado')
+                                                            <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">✓ Entregado</span>
+                                                        @endif
+                                                    </div>
+                                                    <p class="text-sm text-gray-600">{{ $pedido->created_at->format('d/m/Y H:i') }} • {{ $pedido->created_at->diffForHumans() }}</p>
+                                                    <p class="text-xs text-gray-500 mt-1">{{ $pedido->items->count() }} {{ $pedido->items->count() == 1 ? 'producto' : 'productos' }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-2xl font-bold text-indigo-600">${{ number_format($pedido->total, 0, ',', '.') }}</p>
+                                                <div class="flex items-center gap-1 text-indigo-600 text-sm font-semibold mt-1">
+                                                    Ver detalles
+                                                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                                    </svg>
+                                                </div>
                                             </div>
                                         </div>
-                                        <span class="text-sm font-semibold {{ $pedido->estado == 'pagado' ? 'text-green-600' : 'text-yellow-600' }}">
-                                            ${{ number_format($pedido->total, 0) }}
-                                        </span>
                                     </a>
                                 @endforeach
                             </div>
@@ -306,49 +355,7 @@
                         @endif
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-3">
-                                <div class="w-1 h-8 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
-                                <h2 class="text-2xl font-bold text-gray-800">Cotizaciones Recientes</h2>
-                            </div>
-                        </div>
 
-                        @if (isset($cotizacionesRecientes) && $cotizacionesRecientes->count() > 0)
-                            <div class="space-y-3">
-                                @foreach ($cotizacionesRecientes as $cotizacion)
-                                    <a href="{{ route('cotizaciones.show', $cotizacion->id) }}" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded-lg flex justify-between items-center transition duration-150">
-                                        <div class="flex items-center gap-3">
-                                            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                            </svg>
-                                            <div>
-                                                <p class="font-medium text-gray-800">{{ Str::limit($cotizacion->nombre, 30) }}</p>
-                                                <p class="text-xs text-gray-500">Estado: {{ Str::title(str_replace('_', ' ', $cotizacion->estado)) }}</p>
-                                            </div>
-                                        </div>
-                                        <span class="text-sm font-semibold {{ $cotizacion->estado == 'cotizado' ? 'text-blue-600' : 'text-gray-600' }}">
-                                            {{ $cotizacion->created_at->diffForHumans() }}
-                                        </span>
-                                    </a>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="text-center py-12">
-                                <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                <h3 class="text-xl font-bold text-gray-600 mb-2">No tienes cotizaciones</h3>
-                                <p class="text-gray-500 mb-6">Solicita un presupuesto personalizado</p>
-                                <a href="{{ route('cotizador.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-all">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                    </svg>
-                                    Solicitar Cotización
-                                </a>
-                            </div>
-                        @endif
-                    </div>
                 </div>
             </div>
 

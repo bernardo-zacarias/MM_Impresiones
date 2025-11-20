@@ -20,6 +20,7 @@ class ItemCarrito extends Model
         'cantidad',
         'costo_final',
         'requiere_diseno',
+        'ruta_archivo',  // Ruta del archivo subido por el cliente
     ];
 
     protected $casts = [

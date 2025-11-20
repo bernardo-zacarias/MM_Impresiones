@@ -336,7 +336,8 @@
     </div>
 @endsection
 
-    <script>
+@push('scripts')
+<script>
         const COSTO_DISENO_BASE = 10000;
         
         // Elementos de Entrada
@@ -439,8 +440,28 @@
         inputCantidad.addEventListener('input', calcularCotizacion);
         checkDiseno.addEventListener('change', calcularCotizacion);
 
+        // 🚨 CRÍTICO: Manejar el envío del formulario para incluir el archivo
+        const formCarrito = document.getElementById('form-carrito');
+        formCarrito.addEventListener('submit', function(e) {
+            // Si hay un archivo seleccionado, copiarlo al formulario
+            if (inputArchivo.files.length > 0) {
+                // Crear un nuevo input file dentro del formulario
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.name = 'archivo_diseno';
+                fileInput.style.display = 'none';
+                
+                // Copiar el archivo seleccionado
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(inputArchivo.files[0]);
+                fileInput.files = dataTransfer.files;
+                
+                // Agregar al formulario
+                formCarrito.appendChild(fileInput);
+            }
+        });
+
         // Inicializar
         window.onload = calcularCotizacion;
-    </script>
-</body>
-</html>
+</script>
+@endpush

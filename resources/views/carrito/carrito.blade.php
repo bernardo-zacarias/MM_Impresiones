@@ -93,8 +93,29 @@
                         @php
                             $granTotal += $item->costo_final;
                             $esCotizado = $item->ancho > 0 || $item->alto > 0;
-                            $nombreItem = $item->cotizacion->nombre ?? 'Ítem no identificado';
-                            $nombreProducto = $item->cotizacion->producto->nombre ?? 'Servicio Genérico';
+                            
+                            // Determinar el nombre del producto y la categoría
+                            $nombreProducto = 'Producto';
+                            $nombreCategoria = 'Sin categoría';
+                            $nombreItem = '';
+                            
+                            // Caso 1: Producto de catálogo directo
+                            if ($item->producto_id && $item->producto) {
+                                $nombreProducto = $item->producto->nombre;
+                                $nombreCategoria = $item->producto->categoria->nombre ?? 'Sin categoría';
+                                $nombreItem = 'Producto de catálogo';
+                            }
+                            // Caso 2: Producto del cotizador (tiene cotizacion_id)
+                            elseif ($item->cotizacion_id && $item->cotizacion) {
+                                // El nombre del producto base
+                                if ($item->cotizacion->producto) {
+                                    $nombreProducto = $item->cotizacion->producto->nombre;
+                                    $nombreCategoria = $item->cotizacion->producto->categoria->nombre ?? 'Sin categoría';
+                                }
+                                // El nombre de la cotización (ej: "Cotización personalizada de Banner")
+                                $nombreItem = $item->cotizacion->nombre ?? 'Cotización personalizada';
+                            }
+                            
                             $tipoOrigen = $esCotizado ? 'Cotización Detallada' : 'Compra de Catálogo';
                         @endphp
                         
@@ -103,12 +124,38 @@
                                 
                                 <!-- Imagen del Producto -->
                                 <div class="flex-shrink-0">
-                                    <div class="relative group">
-                                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl"></div>
-                                        <img src="{{ $item->cotizacion->producto->imagen ?? 'https://via.placeholder.com/120x120?text=MM' }}" 
-                                             alt="{{ $nombreProducto }}" 
-                                             class="relative w-28 h-28 object-cover rounded-xl shadow-lg">
-                                    </div>
+                                    @php
+                                        // Determinar la imagen a mostrar
+                                        $imagenProducto = null;
+                                        $tieneImagen = false;
+                                        
+                                        // Caso 1: Producto de catálogo directo
+                                        if ($item->producto_id && $item->producto && $item->producto->imagen) {
+                                            $imagenProducto = asset('storage/' . $item->producto->imagen);
+                                            $tieneImagen = true;
+                                        }
+                                        // Caso 2: Producto del cotizador (tiene cotizacion_id)
+                                        elseif ($item->cotizacion_id && $item->cotizacion && $item->cotizacion->producto && $item->cotizacion->producto->imagen) {
+                                            $imagenProducto = asset('storage/' . $item->cotizacion->producto->imagen);
+                                            $tieneImagen = true;
+                                        }
+                                    @endphp
+                                    
+                                    @if($tieneImagen)
+                                        <div class="relative group">
+                                            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            <img src="{{ $imagenProducto }}" 
+                                                 alt="{{ $nombreProducto }}" 
+                                                 class="relative w-28 h-28 object-cover rounded-xl shadow-lg group-hover:scale-105 transition-transform duration-300">
+                                        </div>
+                                    @else
+                                        <!-- Logo/Icono por defecto para productos del cotizador -->
+                                        <div class="w-28 h-28 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg flex items-center justify-center group hover:scale-105 transition-transform duration-300">
+                                            <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                            </svg>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <!-- Información del Producto -->
@@ -119,7 +166,15 @@
                                                 {{ $tipoOrigen }}
                                             </span>
                                             <h2 class="text-xl font-bold text-gray-800">{{ $nombreProducto }}</h2>
-                                            <p class="text-sm text-gray-600 mt-1">{{ $nombreItem }}</p>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                                </svg>
+                                                <p class="text-sm text-gray-600">{{ $nombreCategoria }}</p>
+                                            </div>
+                                            @if($nombreItem)
+                                                <p class="text-xs text-gray-500 mt-1 italic">{{ $nombreItem }}</p>
+                                            @endif
                                         </div>
                                     </div>
                                     
@@ -221,13 +276,33 @@
                                 <p class="text-xs text-gray-600 mt-2">* Sin incluir costos de envío</p>
                             </div>
 
-                            <!-- Botón de Pago -->
+                            <!-- Botón de Pago con Webpay -->
                             <form action="{{ route('checkout.store') }}" method="POST">
                                 @csrf
                                 <button type="submit" 
-                                    class="w-full mt-6 bg-green-500 text-white font-bold py-3 rounded-lg hover:bg-green-600 transition duration-150 shadow-lg">
-                                    Pagar Ahora
+                                    class="w-full mt-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3 group">
+                                    <svg class="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                    </svg>
+                                    <span class="text-lg">Proceder al Pago</span>
+                                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                    </svg>
                                 </button>
+                                
+                                <!-- Información de Webpay -->
+                                <div class="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                        </svg>
+                                        <span class="text-sm font-semibold text-gray-700">Pago seguro con</span>
+                                        <span class="px-2 py-1 bg-white rounded font-bold text-indigo-700 border border-indigo-300 shadow-sm">Webpay Plus</span>
+                                    </div>
+                                    <p class="text-xs text-center text-gray-600 mt-2">
+                                        Serás redirigido a la pasarela de pago de Transbank
+                                    </p>
+                                </div>
                             </form>
 
                             <!-- Botón Seguir Comprando -->

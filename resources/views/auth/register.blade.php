@@ -108,6 +108,28 @@
                                    placeholder="+56 9 1234 5678">
                         </div>
 
+                        <!-- Región -->
+                        <div>
+                            <label for="region" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Región
+                            </label>
+                            <select name="region" 
+                                    id="region" 
+                                    class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                                    onchange="cargarCiudades()"
+                                    required>
+                                <option value="">Seleccione una región</option>
+                                @foreach(config('ubicaciones.regiones') as $nombreRegion => $ciudades)
+                                    <option value="{{ $nombreRegion }}" {{ old('region') == $nombreRegion ? 'selected' : '' }}>
+                                        {{ $nombreRegion }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <!-- Ciudad -->
                         <div>
                             <label for="ciudad" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
@@ -116,17 +138,17 @@
                                 </svg>
                                 Ciudad
                             </label>
-                            <input type="text" 
-                                   name="ciudad" 
-                                   id="ciudad" 
-                                   class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all" 
-                                   value="{{ old('ciudad') }}" 
-                                   required
-                                   placeholder="Ej: Santiago">
+                            <select name="ciudad" 
+                                    id="ciudad" 
+                                    class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                                    onchange="cargarComunas()"
+                                    required>
+                                <option value="">Primero seleccione una región</option>
+                            </select>
                         </div>
 
                         <!-- Comuna -->
-                        <div>
+                        <div class="md:col-span-2">
                             <label for="comuna" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -134,13 +156,12 @@
                                 </svg>
                                 Comuna
                             </label>
-                            <input type="text" 
-                                   name="comuna" 
-                                   id="comuna" 
-                                   class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all" 
-                                   value="{{ old('comuna') }}" 
-                                   required
-                                   placeholder="Ej: Providencia">
+                            <select name="comuna" 
+                                    id="comuna" 
+                                    class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+                                    required>
+                                <option value="">Primero seleccione una ciudad</option>
+                            </select>
                         </div>
                     </div>
 
@@ -237,3 +258,92 @@
     </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    // Datos de ubicaciones desde Laravel
+    const ubicaciones = @json(config('ubicaciones.regiones'));
+
+    function cargarCiudades() {
+        const regionSelect = document.getElementById('region');
+        const ciudadSelect = document.getElementById('ciudad');
+        const comunaSelect = document.getElementById('comuna');
+        
+        const regionSeleccionada = regionSelect.value;
+        
+        // Limpiar selectores
+        ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
+        comunaSelect.innerHTML = '<option value="">Primero seleccione una ciudad</option>';
+        
+        if (regionSeleccionada && ubicaciones[regionSeleccionada]) {
+            const ciudades = ubicaciones[regionSeleccionada];
+            
+            for (const ciudad in ciudades) {
+                const option = document.createElement('option');
+                option.value = ciudad;
+                option.textContent = ciudad;
+                ciudadSelect.appendChild(option);
+            }
+            
+            ciudadSelect.disabled = false;
+        } else {
+            ciudadSelect.disabled = true;
+            comunaSelect.disabled = true;
+        }
+    }
+
+    function cargarComunas() {
+        const regionSelect = document.getElementById('region');
+        const ciudadSelect = document.getElementById('ciudad');
+        const comunaSelect = document.getElementById('comuna');
+        
+        const regionSeleccionada = regionSelect.value;
+        const ciudadSeleccionada = ciudadSelect.value;
+        
+        // Limpiar selector de comunas
+        comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
+        
+        if (regionSeleccionada && ciudadSeleccionada && 
+            ubicaciones[regionSeleccionada] && 
+            ubicaciones[regionSeleccionada][ciudadSeleccionada]) {
+            
+            const comunas = ubicaciones[regionSeleccionada][ciudadSeleccionada];
+            
+            comunas.forEach(comuna => {
+                const option = document.createElement('option');
+                option.value = comuna;
+                option.textContent = comuna;
+                comunaSelect.appendChild(option);
+            });
+            
+            comunaSelect.disabled = false;
+        } else {
+            comunaSelect.disabled = true;
+        }
+    }
+
+    // Cargar valores guardados si hay errores de validación
+    document.addEventListener('DOMContentLoaded', function() {
+        const regionActual = document.getElementById('region').value;
+        if (regionActual) {
+            cargarCiudades();
+            
+            // Esperar a que se carguen las ciudades y luego cargar comunas
+            setTimeout(() => {
+                const ciudadActual = '{{ old('ciudad') }}';
+                if (ciudadActual) {
+                    document.getElementById('ciudad').value = ciudadActual;
+                    cargarComunas();
+                    
+                    setTimeout(() => {
+                        const comunaActual = '{{ old('comuna') }}';
+                        if (comunaActual) {
+                            document.getElementById('comuna').value = comunaActual;
+                        }
+                    }, 100);
+                }
+            }, 100);
+        }
+    });
+</script>
+@endpush

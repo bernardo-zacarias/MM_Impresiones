@@ -120,6 +120,8 @@ class UserController extends Controller
             'ciudad' => 'nullable|string|max:255',
         ]);
 
+        $rolAnterior = $usuario->rol;
+
         $usuario->update([
             'name' => $request->name,
             'email' => $request->email,
@@ -133,8 +135,13 @@ class UserController extends Controller
             $usuario->update(['password' => Hash::make($request->password)]);
         }
 
+        $mensaje = 'Usuario actualizado correctamente.';
+        if ($rolAnterior !== $request->rol) {
+            $mensaje .= " El rol cambió de '{$rolAnterior}' a '{$request->rol}'.";
+        }
+
         return redirect()->route('administracion.usuarios.index')
-            ->with('success', 'Usuario actualizado correctamente.');
+            ->with('success', $mensaje);
     }
 
     /**

@@ -99,27 +99,41 @@
                     </div>
 
                     <div>
-                        <label for="comuna" class="block text-sm font-semibold text-gray-700 mb-2">
-                            Comuna
+                        <label for="region" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Región
                         </label>
-                        <input type="text" 
-                               id="comuna" 
-                               name="comuna" 
-                               value="{{ old('comuna', $user->comuna) }}" 
-                               class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                               placeholder="Ej: Santiago Centro">
+                        <select id="region" 
+                                name="region" 
+                                class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                onchange="cargarCiudades()">
+                            <option value="">Seleccione una región</option>
+                            @foreach(config('ubicaciones.regiones') as $nombreRegion => $ciudades)
+                                <option value="{{ $nombreRegion }}">{{ $nombreRegion }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div>
                         <label for="ciudad" class="block text-sm font-semibold text-gray-700 mb-2">
                             Ciudad
                         </label>
-                        <input type="text" 
-                               id="ciudad" 
-                               name="ciudad" 
-                               value="{{ old('ciudad', $user->ciudad) }}" 
-                               class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                               placeholder="Ej: Santiago">
+                        <select id="ciudad" 
+                                name="ciudad" 
+                                class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                onchange="cargarComunas()">
+                            <option value="">Primero seleccione una región</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="comuna" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Comuna
+                        </label>
+                        <select id="comuna" 
+                                name="comuna" 
+                                class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                            <option value="">Primero seleccione una ciudad</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -185,3 +199,94 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Datos de ubicaciones desde Laravel
+    const ubicaciones = @json(config('ubicaciones.regiones'));
+    const ciudadActual = '{{ old('ciudad', $user->ciudad) }}';
+    const comunaActual = '{{ old('comuna', $user->comuna) }}';
+
+    function cargarCiudades() {
+        const regionSelect = document.getElementById('region');
+        const ciudadSelect = document.getElementById('ciudad');
+        const comunaSelect = document.getElementById('comuna');
+        
+        const regionSeleccionada = regionSelect.value;
+        
+        // Limpiar selectores
+        ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
+        comunaSelect.innerHTML = '<option value="">Primero seleccione una ciudad</option>';
+        
+        if (regionSeleccionada && ubicaciones[regionSeleccionada]) {
+            const ciudades = ubicaciones[regionSeleccionada];
+            
+            for (const ciudad in ciudades) {
+                const option = document.createElement('option');
+                option.value = ciudad;
+                option.textContent = ciudad;
+                if (ciudad === ciudadActual) {
+                    option.selected = true;
+                }
+                ciudadSelect.appendChild(option);
+            }
+            
+            // Si hay ciudad seleccionada, cargar comunas
+            if (ciudadActual) {
+                cargarComunas();
+            }
+        }
+    }
+
+    function cargarComunas() {
+        const regionSelect = document.getElementById('region');
+        const ciudadSelect = document.getElementById('ciudad');
+        const comunaSelect = document.getElementById('comuna');
+        
+        const regionSeleccionada = regionSelect.value;
+        const ciudadSeleccionada = ciudadSelect.value;
+        
+        // Limpiar selector de comunas
+        comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
+        
+        if (regionSeleccionada && ciudadSeleccionada && 
+            ubicaciones[regionSeleccionada] && 
+            ubicaciones[regionSeleccionada][ciudadSeleccionada]) {
+            
+            const comunas = ubicaciones[regionSeleccionada][ciudadSeleccionada];
+            
+            comunas.forEach(comuna => {
+                const option = document.createElement('option');
+                option.value = comuna;
+                option.textContent = comuna;
+                if (comuna === comunaActual) {
+                    option.selected = true;
+                }
+                comunaSelect.appendChild(option);
+            });
+        }
+    }
+
+    // Detectar región basándose en ciudad actual
+    function detectarRegion() {
+        if (!ciudadActual) return null;
+        
+        for (const [region, ciudades] of Object.entries(ubicaciones)) {
+            if (ciudades[ciudadActual]) {
+                return region;
+            }
+        }
+        return null;
+    }
+
+    // Inicializar al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        const regionDetectada = detectarRegion();
+        
+        if (regionDetectada) {
+            document.getElementById('region').value = regionDetectada;
+            cargarCiudades();
+        }
+    });
+</script>
+@endpush

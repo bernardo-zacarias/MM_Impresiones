@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Transbank\Webpay\WebpayPlus\Transaction;
+use Transbank\Webpay\Options;
 use App\Models\Pedido;
 use App\Models\User;
 use App\Mail\PedidoConfirmado;
@@ -23,14 +24,14 @@ class TransbankController extends Controller
         if ($environment === 'production') {
             // PRODUCCIÓN: Usar credenciales reales desde .env
             return Transaction::buildForProduction(
-                config('services.transbank.commerce_code'),
-                config('services.transbank.api_key')
+                config('services.transbank.api_key'),
+                config('services.transbank.commerce_code')
             );
         } else {
-            // INTEGRACIÓN (TEST): Usar credenciales de prueba
+            // INTEGRACIÓN (TEST): Usar credenciales de prueba de Transbank
             return Transaction::buildForIntegration(
-                '597055555532',
-                '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C'
+                '579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C',
+                '597055555532'
             );
         }
     }

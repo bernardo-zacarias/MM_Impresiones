@@ -15,19 +15,29 @@ class CotizadorController extends Controller
      */
     public function index()
     {
-        // 1. Cargar las REGLAS DE COTIZACIÓN
-        $cotizaciones = Cotizacion::where('valor', '>', 0)
-                                    ->with('producto') 
-                                    ->get();
+        // Intentar cargar cotizaciones configuradas
+        $cotizaciones = Cotizacion::where('valor', '>', 0)->get();
 
-        // 2. Mapear la colección para que el frontend (cotizador.blade.php) la entienda
-        $productosCotizables = $cotizaciones->map(function ($cotizacion) {
-            return [
-                'id' => $cotizacion->id, 
-                'nombre' => $cotizacion->nombre . ($cotizacion->producto ? ' (' . $cotizacion->producto->nombre . ')' : ''),
-                'valor_base' => $cotizacion->valor,
-            ];
-        });
+        // Si no hay cotizaciones, usar productos directamente
+        if ($cotizaciones->isEmpty()) {
+            $productos = Producto::where('precio', '>', 0)->get();
+            $productosCotizables = $productos->map(function ($producto) {
+                return [
+                    'id' => $producto->id, 
+                    'nombre' => $producto->nombre,
+                    'valor_base' => $producto->precio,
+                ];
+            });
+        } else {
+            // Mapear cotizaciones existentes
+            $productosCotizables = $cotizaciones->map(function ($cotizacion) {
+                return [
+                    'id' => $cotizacion->id, 
+                    'nombre' => $cotizacion->nombre,
+                    'valor_base' => $cotizacion->valor,
+                ];
+            });
+        }
         
         return view('cotizador.cotizador', compact('productosCotizables'));
     }

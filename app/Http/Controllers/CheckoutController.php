@@ -48,10 +48,19 @@ class CheckoutController extends Controller
 
             // 5. Mover los ítems del carrito al detalle del Pedido
             foreach ($carrito->items as $itemCarrito) {
+                // Obtener el nombre del producto (de catálogo o cotización)
+                $nombreProducto = 'Producto';
+                if ($itemCarrito->producto_id && $itemCarrito->producto) {
+                    $nombreProducto = $itemCarrito->producto->nombre;
+                } elseif ($itemCarrito->cotizacion_id && $itemCarrito->cotizacion) {
+                    $nombreProducto = $itemCarrito->cotizacion->nombre;
+                }
+                
                 ItemPedido::create([
                     'pedido_id' => $pedido->id,
                     'cotizacion_id' => $itemCarrito->cotizacion_id,
                     'producto_id' => $itemCarrito->producto_id,
+                    'producto_nombre' => $nombreProducto,
                     'cantidad' => $itemCarrito->cantidad,
                     'costo_final' => $itemCarrito->costo_final,
                     'ancho' => $itemCarrito->ancho,

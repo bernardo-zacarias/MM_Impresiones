@@ -90,10 +90,30 @@
                             </p>
                             <p class="text-xs {{ $item->requiere_diseno ? 'text-red-500' : 'text-green-500' }}">
                                 Diseño: {{ $item->requiere_diseno ? 'SOLICITADO' : 'Proporcionado' }}
-                                @if($item->ruta_archivo)
-                                    (Archivo adjunto: Sí)
-                                @endif
                             </p>
+                            
+                            @if($item->ruta_archivo)
+                                @php
+                                    $extension = pathinfo($item->ruta_archivo, PATHINFO_EXTENSION);
+                                    $esImagen = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
+                                @endphp
+                                <div class="mt-2 inline-flex items-center gap-2">
+                                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">
+                                        ✓ Archivo adjunto
+                                    </span>
+                                    @if($esImagen)
+                                        <button onclick="verArchivo('{{ asset('storage/' . $item->ruta_archivo) }}', '{{ basename($item->ruta_archivo) }}')" 
+                                                class="px-2 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-semibold rounded transition-colors">
+                                            Ver imagen
+                                        </button>
+                                    @endif
+                                    <a href="{{ asset('storage/' . $item->ruta_archivo) }}" 
+                                       download
+                                       class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-semibold rounded transition-colors">
+                                        Descargar
+                                    </a>
+                                </div>
+                            @endif
                         </div>
                         <span class="font-bold text-lg text-indigo-600">
                             ${{ number_format($item->costo_final, 0, ',', '.') }}
@@ -109,4 +129,61 @@
             </a>
         </div>
     </div>
+
+    <!-- Modal para ver archivos -->
+    <div id="archivoModal" class="fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-50 p-4" onclick="cerrarArchivo()">
+        <div class="relative max-w-5xl w-full" onclick="event.stopPropagation()">
+            <div class="bg-white rounded-t-xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900">Mi Archivo</h3>
+                        <p id="archivoNombre" class="text-sm text-gray-600"></p>
+                    </div>
+                </div>
+                <button onclick="cerrarArchivo()" class="bg-red-100 hover:bg-red-200 text-red-600 rounded-lg w-10 h-10 flex items-center justify-center transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="bg-gray-900 rounded-b-xl p-6 flex items-center justify-center" style="max-height: calc(100vh - 150px);">
+                <img id="archivoImagen" src="" alt="Tu archivo" class="max-w-full max-h-full rounded-lg shadow-2xl">
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+    function verArchivo(url, nombre) {
+        const modal = document.getElementById('archivoModal');
+        const img = document.getElementById('archivoImagen');
+        const nombreEl = document.getElementById('archivoNombre');
+        
+        img.src = url;
+        nombreEl.textContent = nombre;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarArchivo() {
+        const modal = document.getElementById('archivoModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            cerrarArchivo();
+        }
+    });
+    </script>
+    @endpush
 @endsection

@@ -34,16 +34,27 @@
                         @error('telefono')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Comuna</label>
-                            <input type="text" name="comuna" value="{{ old('comuna') }}"
-                                   class="w-full border rounded-lg px-4 py-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Región</label>
+                            <select id="region" name="region" class="w-full border rounded-lg px-4 py-2" onchange="cargarCiudades()">
+                                <option value="">Seleccione una región</option>
+                                @foreach(config('ubicaciones.regiones') as $nombreRegion => $ciudades)
+                                    <option value="{{ $nombreRegion }}">{{ $nombreRegion }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Ciudad</label>
-                            <input type="text" name="ciudad" value="{{ old('ciudad') }}"
-                                   class="w-full border rounded-lg px-4 py-2">
+                            <select id="ciudad" name="ciudad" class="w-full border rounded-lg px-4 py-2" onchange="cargarComunas()">
+                                <option value="">Seleccione una ciudad</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Comuna</label>
+                            <select id="comuna" name="comuna" class="w-full border rounded-lg px-4 py-2">
+                                <option value="">Seleccione una comuna</option>
+                            </select>
                         </div>
                     </div>
 
@@ -81,4 +92,80 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const ubicaciones = @json(config('ubicaciones.regiones'));
+    
+    function cargarCiudades() {
+        const regionSelect = document.getElementById('region');
+        const ciudadSelect = document.getElementById('ciudad');
+        const comunaSelect = document.getElementById('comuna');
+        
+        ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';
+        comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
+        
+        const regionSeleccionada = regionSelect.value;
+        if (regionSeleccionada && ubicaciones[regionSeleccionada]) {
+            const ciudades = Object.keys(ubicaciones[regionSeleccionada]);
+            ciudades.forEach(ciudad => {
+                const option = document.createElement('option');
+                option.value = ciudad;
+                option.textContent = ciudad;
+                ciudadSelect.appendChild(option);
+            });
+        }
+    }
+    
+    function cargarComunas() {
+        const regionSelect = document.getElementById('region');
+        const ciudadSelect = document.getElementById('ciudad');
+        const comunaSelect = document.getElementById('comuna');
+        
+        comunaSelect.innerHTML = '<option value="">Seleccione una comuna</option>';
+        
+        const regionSeleccionada = regionSelect.value;
+        const ciudadSeleccionada = ciudadSelect.value;
+        
+        if (regionSeleccionada && ciudadSeleccionada && ubicaciones[regionSeleccionada][ciudadSeleccionada]) {
+            const comunas = ubicaciones[regionSeleccionada][ciudadSeleccionada];
+            comunas.forEach(comuna => {
+                const option = document.createElement('option');
+                option.value = comuna;
+                option.textContent = comuna;
+                comunaSelect.appendChild(option);
+            });
+        }
+    }
+    
+    // Restaurar valores old() después de error de validación
+    document.addEventListener('DOMContentLoaded', function() {
+        const oldCiudad = "{{ old('ciudad') }}";
+        const oldComuna = "{{ old('comuna') }}";
+        
+        if (oldCiudad || oldComuna) {
+            // Buscar y seleccionar la región correcta
+            for (const [region, ciudades] of Object.entries(ubicaciones)) {
+                if (oldCiudad && ciudades[oldCiudad]) {
+                    document.getElementById('region').value = region;
+                    cargarCiudades();
+                    
+                    setTimeout(() => {
+                        document.getElementById('ciudad').value = oldCiudad;
+                        cargarComunas();
+                        
+                        setTimeout(() => {
+                            if (oldComuna) {
+                                document.getElementById('comuna').value = oldComuna;
+                            }
+                        }, 50);
+                    }, 50);
+                    break;
+                }
+            }
+        }
+    });
+</script>
+@endpush
+
 @endsection
