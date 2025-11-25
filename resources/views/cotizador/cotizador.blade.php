@@ -7,45 +7,45 @@
 
 
 
-    <div class="max-w-7xl mx-auto p-8">
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
 
         <!-- Header -->
-        <div class="mb-10">
-            <div class="flex items-center gap-4 mb-6">
-                <div class="w-1 h-16 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
+        <div class="mb-6 sm:mb-8 lg:mb-10">
+            <div class="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div class="w-1 h-12 sm:h-16 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
                 <div>
-                    <h1 class="text-5xl font-extrabold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-800 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                         Calculadora de Cotización
                     </h1>
-                    <p class="text-gray-600 text-lg mt-2">Obtén un presupuesto personalizado en tiempo real</p>
+                    <p class="text-gray-600 text-sm sm:text-base lg:text-lg mt-1 sm:mt-2">Obtén un presupuesto personalizado en tiempo real</p>
                 </div>
             </div>
         </div>
 
         <!-- Mensajes de Éxito/Error -->
         @if (session('success'))
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 px-6 py-4 rounded-xl relative mb-8 shadow-lg">
-                <div class="flex items-center gap-3">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 px-4 py-3 sm:px-6 sm:py-4 rounded-xl relative mb-6 sm:mb-8 shadow-lg">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <div>
-                        <strong class="font-bold text-green-800">¡Genial!</strong>
-                        <span class="block sm:inline text-green-700">{{ session('success') }}</span>
+                        <strong class="font-bold text-green-800 text-sm sm:text-base">¡Genial!</strong>
+                        <span class="block sm:inline text-green-700 text-sm sm:text-base">{{ session('success') }}</span>
                     </div>
                 </div>
             </div>
         @endif
         
         @if ($errors->any())
-            <div class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 px-6 py-4 rounded-xl mb-8 shadow-lg">
-                <div class="flex items-start gap-3">
-                    <svg class="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-500 px-4 py-3 sm:px-6 sm:py-4 rounded-xl mb-6 sm:mb-8 shadow-lg">
+                <div class="flex items-start gap-2 sm:gap-3">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <div>
-                        <p class="font-bold text-red-800 mb-2">⚠️ Por favor, corrige los siguientes errores:</p>
-                        <ul class="list-disc ml-5 text-red-700 space-y-1">
+                        <p class="font-bold text-red-800 mb-2 text-sm sm:text-base">⚠️ Por favor, corrige los siguientes errores:</p>
+                        <ul class="list-disc ml-5 text-red-700 space-y-1 text-sm sm:text-base">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -55,24 +55,24 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             
             {{-- SECCIÓN IZQUIERDA: Formulario --}}
             <div class="lg:col-span-2 space-y-6">
                 
                 {{-- 1. SELECCIÓN DE TRABAJO --}}
-                <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold text-xl">1</span>
+                <div class="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
+                    <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <span class="text-white font-bold text-lg sm:text-xl">1</span>
                         </div>
-                        <label for="tipo_trabajo" class="text-2xl font-bold text-gray-800">
+                        <label for="tipo_trabajo" class="text-xl sm:text-2xl font-bold text-gray-800">
                             Tipo de Trabajo
                         </label>
                     </div>
                     
                     <select id="tipo_trabajo" 
-                            class="w-full border-2 border-gray-300 rounded-xl shadow-sm p-4 text-lg focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all">
+                            class="w-full border-2 border-gray-300 rounded-xl shadow-sm p-3 sm:p-4 text-base sm:text-lg focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all">
                         <option value="" data-valor="0">Selecciona un tipo de trabajo...</option>
                         @foreach($productosCotizables as $producto)
                             <option 
@@ -87,17 +87,17 @@
                 </div>
 
                 {{-- 2. DIMENSIONES Y CANTIDAD --}}
-                <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold text-xl">2</span>
+                <div class="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
+                    <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <span class="text-white font-bold text-lg sm:text-xl">2</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800">
                             Dimensiones y Cantidad
                         </h3>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                         <div>
                             <label for="alto" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,26 +134,26 @@
                     </div>
 
                     <!-- Vista previa del área -->
-                    <div class="mt-6 p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200">
-                        <div class="flex items-center justify-between">
+                    <div class="mt-4 sm:mt-6 p-3 sm:p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
                             <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                                 </svg>
-                                <span class="font-semibold text-gray-700">Área Total:</span>
+                                <span class="font-semibold text-gray-700 text-sm sm:text-base">Área Total:</span>
                             </div>
-                            <span id="preview-area" class="text-2xl font-bold text-purple-600">1.00 m²</span>
+                            <span id="preview-area" class="text-xl sm:text-2xl font-bold text-purple-600">1.00 m²</span>
                         </div>
                     </div>
                 </div>
 
                 {{-- 3. OPCIONES ADICIONALES --}}
-                <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold text-xl">3</span>
+                <div class="bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
+                    <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                            <span class="text-white font-bold text-lg sm:text-xl">3</span>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-800">
                             Opciones de Impresión
                         </h3>
                     </div>
@@ -212,19 +212,19 @@
 
             {{-- SECCIÓN DERECHA: Resumen --}}
             <div class="lg:col-span-1">
-                <div id="resumen-cotizacion" class="sticky top-8 rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+                <div id="resumen-cotizacion" class="lg:sticky lg:top-8 rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
                     
                     <!-- Header del Resumen -->
-                    <div class="bg-gradient-to-br from-purple-600 to-pink-600 p-6 text-white">
-                        <h2 class="text-2xl font-bold flex items-center gap-2">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-br from-purple-600 to-pink-600 p-4 sm:p-6 text-white">
+                        <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
                             Resumen del Pedido
                         </h2>
                     </div>
 
-                    <div class="p-6 bg-white space-y-4">
+                    <div class="p-4 sm:p-6 bg-white space-y-3 sm:space-y-4">
                         <!-- Detalles del Trabajo -->
                         <div class="space-y-3">
                             <div class="flex items-start gap-2">
@@ -274,10 +274,10 @@
                         </div>
 
                         <!-- Total Final -->
-                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
-                            <div class="flex justify-between items-center">
-                                <span class="text-lg font-bold text-gray-800">TOTAL ESTIMADO</span>
-                                <span id="total-final" class="text-3xl font-extrabold text-green-700">$0.00</span>
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 sm:p-4 border-2 border-green-200">
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-base sm:text-lg font-bold text-gray-800">TOTAL ESTIMADO</span>
+                                <span id="total-final" class="text-2xl sm:text-3xl font-extrabold text-green-700">$0.00</span>
                             </div>
                         </div>
 
@@ -298,11 +298,11 @@
                                     class="group relative block w-full overflow-hidden rounded-xl bg-gradient-to-br from-green-600 via-green-500 to-emerald-600 p-0.5 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                                     <div class="relative bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl overflow-hidden">
                                         <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <div class="relative px-6 py-4 flex items-center justify-center gap-3">
-                                            <svg class="w-6 h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="relative px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-center gap-2 sm:gap-3">
+                                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                             </svg>
-                                            <span class="text-lg font-bold text-white">
+                                            <span class="text-base sm:text-lg font-bold text-white">
                                                 Añadir al Carrito
                                             </span>
                                         </div>
@@ -310,8 +310,8 @@
                                 </button>
                             </form>
 
-                            <a href="{{ route('catalogo.index') }}" class="block w-full text-center px-6 py-3 border-2 border-purple-600 text-purple-600 font-bold rounded-xl hover:bg-purple-50 transition-all duration-300 flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <a href="{{ route('catalogo.index') }}" class="block w-full text-center px-4 py-2 sm:px-6 sm:py-3 border-2 border-purple-600 text-purple-600 font-bold rounded-xl hover:bg-purple-50 transition-all duration-300 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                                 </svg>
                                 Ver Catálogo

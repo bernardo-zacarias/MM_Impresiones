@@ -5,8 +5,19 @@
 {{-- Usamos la sección 'content' para el diseño principal --}}
 @section('content')
 
-    <div class="flex min-h-screen -mt-8"> {{-- -mt-8 ajusta el espacio del header --}}
-        <aside class="w-80 bg-white shadow-2xl sticky top-0 h-screen overflow-y-auto border-r-4 border-indigo-200" style="top: 64px;"> {{-- top: 64px (h-16 del header) --}}
+    <div class="flex flex-col lg:flex-row min-h-screen -mt-8"> {{-- -mt-8 ajusta el espacio del header --}}
+        <!-- Mobile Category Toggle Button -->
+        <button 
+            id="mobile-category-toggle" 
+            class="lg:hidden fixed bottom-4 right-4 z-50 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all"
+            onclick="toggleMobileCategories()"
+        >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+
+        <aside id="mobile-categories" class="hidden lg:block lg:w-80 bg-white shadow-2xl lg:sticky lg:top-0 h-screen overflow-y-auto border-r-4 border-indigo-200 fixed inset-0 z-40" style="top: 64px;"> {{-- top: 64px (h-16 del header) --}}
             <div class="p-6 bg-gradient-to-br from-indigo-600 to-purple-600">
                 <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-2">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,13 +114,13 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-8 overflow-y-auto">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
             <div class="max-w-7xl mx-auto">
-                <div class="mb-10">
-                    <h1 class="text-5xl font-extrabold text-gray-800 mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <div class="mb-6 sm:mb-10">
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-800 mb-2 sm:mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                         Catálogo de Productos
                     </h1>
-                    <p class="text-gray-600 text-lg">Descubre nuestra selección de productos listos para comprar</p>
+                    <p class="text-gray-600 text-sm sm:text-base lg:text-lg">Descubre nuestra selección de productos listos para comprar</p>
                 </div>
 
                 <div id="no-results" class="hidden text-center py-20">
@@ -123,16 +134,16 @@
                 @if (isset($categorias))
                     @foreach ($categorias as $categoria)
                         @if (isset($categoria->productos) && $categoria->productos->count() > 0)
-                            <div class="mb-16 categoria-section" data-categoria="cat-{{ $categoria->id }}">
-                                <div class="flex items-center gap-4 mb-8">
-                                    <div class="w-1 h-12 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></div>
+                            <div class="mb-10 sm:mb-16 categoria-section" data-categoria="cat-{{ $categoria->id }}">
+                                <div class="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                                    <div class="w-1 h-8 sm:h-12 bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full"></div>
                                     <div>
-                                        <h2 class="text-4xl font-bold text-gray-800">{{ $categoria->nombre }}</h2>
-                                        <p class="text-gray-500 mt-1">{{ $categoria->productos->count() }} productos disponibles</p>
+                                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">{{ $categoria->nombre }}</h2>
+                                        <p class="text-gray-500 mt-1 text-sm sm:text-base">{{ $categoria->productos->count() }} productos disponibles</p>
                                     </div>
                                 </div>
                                 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                                     @foreach ($categoria->productos as $producto)
                                         <div id="producto-{{ $producto->id }}" class="producto-card bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-all duration-300 border border-gray-100" data-categoria="cat-{{ $categoria->id }}" data-nombre="{{ strtolower($producto->nombre) }}">
                                             <div class="relative overflow-hidden group">
@@ -141,18 +152,18 @@
                                                     <img 
                                                         src="{{ $producto->imagen ? asset('storage/' . $producto->imagen) : 'https://via.placeholder.com/400x300?text=Sin+Imagen' }}" 
                                                         alt="{{ $producto->nombre }}" 
-                                                        class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                                                        class="w-full h-40 sm:h-48 lg:h-56 object-cover group-hover:scale-110 transition-transform duration-500"
                                                     >
                                                 </a>
                                             </div>
 
-                                            <div class="p-6">
-                                                <h3 class="text-2xl font-bold text-gray-800 mb-2">
+                                            <div class="p-4 sm:p-5 lg:p-6">
+                                                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-2">
                                                     {{ $producto->nombre }}
                                                 </h3>
-                                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $producto->descripcion ?? 'Producto de alta calidad' }}</p>
-                                                <div class="flex items-baseline gap-2 mb-4">
-                                                    <p class="text-3xl font-extrabold text-indigo-600">
+                                                <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{{ $producto->descripcion ?? 'Producto de alta calidad' }}</p>
+                                                <div class="flex items-baseline gap-2 mb-3 sm:mb-4">
+                                                    <p class="text-2xl sm:text-3xl font-extrabold text-indigo-600">
                                                         ${{ number_format($producto->precio, 0, ',', '.') }}
                                                     </p>
                                                 </div>
@@ -160,12 +171,12 @@
                                                 <a href="{{ route('catalogo.show', $producto->id) }}" class="group relative block w-full overflow-hidden rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-500 to-purple-600 p-0.5 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                                                     <div class="relative bg-white rounded-xl overflow-hidden">
                                                         <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                        <div class="relative px-6 py-3 flex items-center justify-center gap-2">
-                                                            <svg class="w-5 h-5 text-indigo-600 group-hover:text-purple-600 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <div class="relative px-4 py-2 sm:px-6 sm:py-3 flex items-center justify-center gap-2">
+                                                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 group-hover:text-purple-600 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                                             </svg>
-                                                            <span class="text-base font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-indigo-600 transition-all duration-300">
+                                                            <span class="text-sm sm:text-base font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-indigo-600 transition-all duration-300">
                                                                 Ver Detalles y Comprar
                                                             </span>
                                                             <svg class="w-5 h-5 text-indigo-600 group-hover:text-purple-600 group-hover:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,6 +307,22 @@
             document.getElementById('no-results').classList.remove('hidden');
         } else {
             document.getElementById('no-results').classList.add('hidden');
+        }
+    }
+
+    // Toggle categorías en móvil
+    function toggleMobileCategories() {
+        const sidebar = document.querySelector('aside');
+        const toggleButton = document.getElementById('mobile-category-toggle');
+        
+        if (sidebar.classList.contains('hidden')) {
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('fixed', 'inset-0', 'z-40', 'bg-white', 'overflow-y-auto');
+            toggleButton.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+        } else {
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('fixed', 'inset-0', 'z-40', 'overflow-y-auto');
+            toggleButton.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
         }
     }
 </script>
