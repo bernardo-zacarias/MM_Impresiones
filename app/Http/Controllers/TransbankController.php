@@ -60,10 +60,16 @@ class TransbankController extends Controller
             
             // URLs de retorno
             $returnUrl = route('transbank.callback');
+            
+            // 💡 Nuevo log para verificar la URL de retorno y facilitar la depuración
+            Log::info('Webpay Init: BuyOrder=' . $buyOrder . ', ReturnURL=' . $returnUrl);
 
             // Crear la transacción en Transbank
             $transaction = $this->getTransaction();
             $response = $transaction->create($buyOrder, $sessionId, $amount, $returnUrl);
+            
+            // 💡 Log del TOKEN generado por Transbank (CRÍTICO para certificación)
+            Log::info('TOKEN WEBPAY OBTENIDO: ' . $response->getToken() . ' para Pedido ID: ' . $pedido->id);
 
             // Guardar el token en el pedido
             $pedido->update([

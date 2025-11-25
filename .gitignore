@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.local
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -22,3 +23,45 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Laravel Cache
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitignore
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Archivos subidos por usuarios (imágenes de productos, diseños)
+/storage/app/public/productos/*
+!/storage/app/public/productos/.gitignore
+/storage/app/public/disenos_clientes/*
+!/storage/app/public/disenos_clientes/.gitignore
+/storage/app/public/archivos_pedidos/*
+!/storage/app/public/archivos_pedidos/.gitignore
+/storage/app/public/designs/*
+!/storage/app/public/designs/.gitignore
+
+# Error logs del servidor
+/public/error_log
+error_log
+
+# Backups de base de datos
+*.sql
+*.sql.gz
+/database/backups/
+
+# Composer
+/composer.phar
+/composer.lock
+
+# NPM
+package-lock.json
+
+# Testing
+.phpunit.result.cache
+coverage/

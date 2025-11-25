@@ -1,24 +1,28 @@
+# ⚠️ Directiva agregada para asegurar que el hosting respete la reescritura
+Options +FollowSymLinks
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
+        # Mantienes -MultiViews y -Indexes, lo cual es correcto.
         Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
 
-    # Handle Authorization Header
+    # Manejar encabezados de autorización y XSRF-Token (correcto)
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Handle X-XSRF-Token Header
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Redirigir barras finales si no son un directorio (correcto)
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # Enviar Solicitudes al Controlador Frontal (index.php)
+    # Esta es la parte CRUCIAL para resolver el 404
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
