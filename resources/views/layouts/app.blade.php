@@ -78,6 +78,7 @@
                     </a>
                 </div>
 
+                <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="{{ route('catalogo.index') }}" class="text-gray-700 hover:text-indigo-600 font-semibold transition-all flex items-center gap-2 group">
                         <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,9 +144,81 @@
                         </a>
                     @endauth
                 </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" type="button" class="text-gray-700 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition-colors">
+                        <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="md:hidden hidden pb-4">
+                <div class="flex flex-col space-y-3">
+                    <a href="{{ route('catalogo.index') }}" class="text-gray-700 hover:text-indigo-600 font-semibold transition-all flex items-center gap-2 py-2 px-4 hover:bg-gray-50 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        Catálogo
+                    </a>
+                    <a href="{{ route('cotizador.index') }}" class="text-gray-700 hover:text-indigo-600 font-semibold transition-all flex items-center gap-2 py-2 px-4 hover:bg-gray-50 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        Cotizador
+                    </a>
+                    
+                    @auth
+                        @if(auth()->user()->rol === 'admin')
+                            <a href="{{ route('administracion.dashboard') }}" class="bg-gradient-to-r from-red-600 to-pink-600 text-white font-bold py-3 px-4 rounded-lg flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Admin
+                                @php
+                                    $pedidosPendientes = \App\Models\Pedido::whereIn('estado', ['pendiente', 'pagado'])->count();
+                                @endphp
+                                @if($pedidosPendientes > 0)
+                                    <span class="bg-yellow-400 text-gray-900 text-xs font-bold rounded-full px-2 py-1">
+                                        {{ $pedidosPendientes }}
+                                    </span>
+                                @endif
+                            </a>
+                        @endif
+                        
+                        <a href="{{ route('home') }}" class="bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-3 px-4 rounded-lg flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Mi Cuenta
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-800 font-semibold py-2 px-4 hover:bg-gray-50 rounded-lg transition-all">
+                            Ingresar
+                        </a>
+                        <a href="{{ route('register') }}" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                            Registrarse
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
+                        </a>
+                    @endauth
+                </div>
             </div>
         </div>
     </nav>
+
+    <script>
+        // Toggle mobile menu
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            var menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
 
 
     {{-- ======================================================= --}}
